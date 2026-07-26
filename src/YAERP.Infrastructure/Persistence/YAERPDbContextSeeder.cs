@@ -36,7 +36,7 @@ public class YAERPDbContextSeeder : IDatabaseSeeder
             await _context.Database.EnsureCreatedAsync(cancellationToken);
 
             // Seed Default Tenant
-            var defaultTenant = await _context.Tenants.FirstOrDefaultAsync(t => t.Name == "Default System Tenant", cancellationToken);
+            var defaultTenant = await _context.Tenants.IgnoreQueryFilters().FirstOrDefaultAsync(t => t.Name == "Default System Tenant", cancellationToken);
             if (defaultTenant == null)
             {
                 defaultTenant = Tenant.Create("Default System Tenant", null);
@@ -47,14 +47,14 @@ public class YAERPDbContextSeeder : IDatabaseSeeder
             var tenantId = defaultTenant.Id;
 
             // Seed Default Admin User
-            if (!await _context.Users.AnyAsync(u => u.Email == "admin@yaerp.local", cancellationToken))
+            if (!await _context.Users.IgnoreQueryFilters().AnyAsync(u => u.Email == "admin@yaerp.local", cancellationToken))
             {
                 var admin = User.Create(tenantId, "admin@yaerp.local", "HASHED_admin123", "System", "Administrator");
                 _context.Users.Add(admin);
             }
 
             // Seed Chart of Accounts
-            if (!await _context.Accounts.AnyAsync(a => a.TenantId == tenantId, cancellationToken))
+            if (!await _context.Accounts.IgnoreQueryFilters().AnyAsync(a => a.TenantId == tenantId, cancellationToken))
             {
                 _context.Accounts.AddRange(
                     Account.Create(tenantId, "1000", "Cash", AccountType.Asset),
@@ -67,9 +67,9 @@ public class YAERPDbContextSeeder : IDatabaseSeeder
             }
 
             // Seed Units of Measure
-            if (!await _context.Set<UnitOfMeasure>().AnyAsync(cancellationToken))
+            if (!await _context.UnitsOfMeasure.IgnoreQueryFilters().AnyAsync(cancellationToken))
             {
-                _context.Set<UnitOfMeasure>().AddRange(
+                _context.UnitsOfMeasure.AddRange(
                     UnitOfMeasure.Create("PCS", "Pieces", false),
                     UnitOfMeasure.Create("KG", "Kilograms", true),
                     UnitOfMeasure.Create("M", "Meters", true),

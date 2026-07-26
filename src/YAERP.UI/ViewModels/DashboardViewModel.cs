@@ -2,12 +2,14 @@ using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MediatR;
+using YAERP.UI.Services;
 
 namespace YAERP.UI.ViewModels;
 
 public partial class DashboardViewModel : ObservableObject
 {
     private readonly IMediator _mediator;
+    private readonly INavigationService? _navigationService;
 
     [ObservableProperty]
     private bool _isBusy;
@@ -21,9 +23,19 @@ public partial class DashboardViewModel : ObservableObject
     [ObservableProperty]
     private int _activeInvoices;
 
-    public DashboardViewModel(IMediator mediator)
+    [ObservableProperty]
+    private int _aiStockoutRiskCount;
+
+    [ObservableProperty]
+    private int _aiLedgerAnomalyCount;
+
+    [ObservableProperty]
+    private bool _hasAiAlerts;
+
+    public DashboardViewModel(IMediator mediator, INavigationService? navigationService = null)
     {
         _mediator = mediator;
+        _navigationService = navigationService;
     }
 
     [RelayCommand]
@@ -35,15 +47,32 @@ public partial class DashboardViewModel : ObservableObject
 
         try
         {
-            // Simulate fetching from mediator queries
-            await Task.Delay(500);
+            // Simulate fetching metrics from mediator queries
+            await Task.Delay(200);
             TotalSales = 120;
             StockCount = 4500;
             ActiveInvoices = 15;
+
+            // AI Operational Health summary metrics
+            AiStockoutRiskCount = 2;
+            AiLedgerAnomalyCount = 1;
+            HasAiAlerts = (AiStockoutRiskCount + AiLedgerAnomalyCount) > 0;
         }
         finally
         {
             IsBusy = false;
         }
+    }
+
+    [RelayCommand]
+    private void NavigateToInventory()
+    {
+        _navigationService?.NavigateTo<InventoryViewModel>();
+    }
+
+    [RelayCommand]
+    private void NavigateToFinance()
+    {
+        _navigationService?.NavigateTo<FinanceViewModel>();
     }
 }

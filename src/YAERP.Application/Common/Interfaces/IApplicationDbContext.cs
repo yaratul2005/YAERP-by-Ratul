@@ -14,11 +14,15 @@ public interface IApplicationDbContext
     DbSet<User> Users { get; }
     DbSet<Role> Roles { get; }
     DbSet<AuditLog> AuditLogs { get; }
+    DbSet<YAERP.Domain.Entities.SyncQueueItem> SyncQueueItems { get; }
+    DbSet<YAERP.Domain.Entities.ApprovalRequest> ApprovalRequests { get; }
+    DbSet<YAERP.Domain.Entities.ApprovalStepLog> ApprovalStepLogs { get; }
 
     DbSet<Product> Products { get; }
     DbSet<Warehouse> Warehouses { get; }
     DbSet<ProductCategory> ProductCategories { get; }
     DbSet<StockMovement> StockMovements { get; }
+    DbSet<UnitOfMeasure> UnitsOfMeasure { get; }
 
     DbSet<Vendor> Vendors { get; }
     DbSet<PurchaseOrder> PurchaseOrders { get; }

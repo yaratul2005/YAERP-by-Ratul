@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Microsoft.ML;
 using Microsoft.ML.Transforms.TimeSeries;
 using YAERP.Application.Common.Interfaces;
@@ -11,58 +13,93 @@ using YAERP.Domain.Inventory;
 
 namespace YAERP.Infrastructure.AI.Services;
 
-public class StockData
+/// <summary>Internal ML.NET input schema for SSA time-series training.</summary>
+internal sealed class StockData
 {
     public float Quantity { get; set; }
 }
 
-public class StockForecast
+/// <summary>Internal ML.NET output schema holding predicted columns.</summary>
+internal sealed class StockForecastOutput
 {
     public float[]? ForecastedQuantity { get; set; }
+    public float[]? LowerBound { get; set; }
+    public float[]? UpperBound { get; set; }
 }
 
-public class InventoryForecastingService : IInventoryForecastingService
+/// <summary>
+/// ML.NET Singular Spectrum Analysis (SSA) inventory demand forecasting engine.
+/// Queries historical <see cref="StockMovement"/> records to train a per-product/warehouse
+/// time-series model and projects demand for a configurable horizon.
+/// </summary>
+public sealed class InventoryForecastingService : IInventoryForecastingService
 {
     private readonly IApplicationDbContext _context;
+    private readonly ILogger<InventoryForecastingService> _logger;
 
-    public InventoryForecastingService(IApplicationDbContext context)
+    /// <summary>Minimum daily data points required to train SSA meaningfully.</summary>
+    private const int MinDataPoints = 10;
+
+    public InventoryForecastingService(
+        IApplicationDbContext context,
+        ILogger<InventoryForecastingService> logger)
     {
         _context = context;
+        _logger = logger;
     }
 
-    public async Task<ProductDemandForecastDto> GenerateForecastAsync(Guid productId, Guid warehouseId, int horizonDays = 30)
-    {
-        var mlContext = new MLContext();
+    // ──────────────────────────────────────────────────────────────
+    // Primary contract (rich DTO with confidence bounds)
+    // ──────────────────────────────────────────────────────────────
 
-        // Get historical outbound shipments (demand) grouped by day
+    /// <inheritdoc/>
+    public async Task<InventoryForecastResultDto> ForecastProductDemandAsync(
+        Guid productId,
+        Guid warehouseId,
+        int horizonDays = 30,
+        CancellationToken cancellationToken = default)
+    {
         var pId = new ProductId(productId);
         var wId = new WarehouseId(warehouseId);
 
+        _logger.LogInformation(
+            "Generating {Horizon}-day SSA demand forecast for Product {ProductId} / Warehouse {WarehouseId}",
+            horizonDays, productId, warehouseId);
+
+        // ── 1. Fetch outbound demand history ──────────────────────
         var movements = await _context.StockMovements
             .AsNoTracking()
             .Where(m => m.ProductId == pId && m.WarehouseId == wId &&
-                       (m.MovementType == StockMovementType.OutboundShipment || m.MovementType == StockMovementType.TransferOut))
+                        (m.MovementType == StockMovementType.OutboundShipment ||
+                         m.MovementType == StockMovementType.TransferOut))
             .OrderBy(m => m.MovementDateUtc)
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
 
-        if (movements.Count < 10)
+        // ── 2. Return empty forecast if insufficient data ─────────
+        if (movements.Count < MinDataPoints)
         {
-            // Not enough data, return safe default
-            return new ProductDemandForecastDto(productId, warehouseId, new decimal[horizonDays], false);
+            _logger.LogWarning(
+                "Only {Count} data points available for Product {ProductId}; returning zero forecast.",
+                movements.Count, productId);
+
+            return BuildEmptyForecast(productId, warehouseId, horizonDays);
         }
 
-        var dailyDemand = movements
+        // ── 3. Aggregate to daily demand series ───────────────────
+        var dailySeries = movements
             .GroupBy(m => m.MovementDateUtc.Date)
+            .OrderBy(g => g.Key)
             .Select(g => new StockData { Quantity = (float)g.Sum(x => x.Quantity) })
             .ToList();
 
-        // Ensure we have enough data points for SSA
-        var seriesLength = dailyDemand.Count;
+        // ── 4. Train SSA model ────────────────────────────────────
+        var mlContext = new MLContext(seed: 42);
+        var seriesLength = dailySeries.Count;
         var windowSize = Math.Max(2, seriesLength / 2);
 
-        var dataView = mlContext.Data.LoadFromEnumerable(dailyDemand);
+        var dataView = mlContext.Data.LoadFromEnumerable(dailySeries);
 
-        var forecastingPipeline = mlContext.Forecasting.ForecastBySsa(
+        var pipeline = mlContext.Forecasting.ForecastBySsa(
             outputColumnName: "ForecastedQuantity",
             inputColumnName: "Quantity",
             windowSize: windowSize,
@@ -73,42 +110,117 @@ public class InventoryForecastingService : IInventoryForecastingService
             confidenceLowerBoundColumn: "LowerBound",
             confidenceUpperBoundColumn: "UpperBound");
 
-        var model = forecastingPipeline.Fit(dataView);
-        var forecastingEngine = model.CreateTimeSeriesEngine<StockData, StockForecast>(mlContext);
+        var model = pipeline.Fit(dataView);
+        var engine = model.CreateTimeSeriesEngine<StockData, StockForecastOutput>(mlContext);
+        var forecast = engine.Predict();
 
-        var forecast = forecastingEngine.Predict();
+        var predicted = NormalizeFloatArray(forecast.ForecastedQuantity, horizonDays);
+        var lower = NormalizeFloatArray(forecast.LowerBound, horizonDays);
+        var upper = NormalizeFloatArray(forecast.UpperBound, horizonDays);
 
-        var predictedDemand = forecast.ForecastedQuantity?.Select(f => (decimal)Math.Max(0, f)).ToArray() ?? new decimal[horizonDays];
-
-        // Total predicted demand for next 30 days
-        var totalPredictedDemand = predictedDemand.Sum();
-
-        // Calculate current stock
-        var currentStockMovements = await _context.StockMovements
+        // ── 5. Compute current on-hand stock ──────────────────────
+        var allMovements = await _context.StockMovements
             .AsNoTracking()
             .Where(m => m.ProductId == pId && m.WarehouseId == wId)
-            .Select(sm => new { sm.MovementType, sm.Quantity })
-            .ToListAsync();
+            .Select(m => new { m.MovementType, m.Quantity })
+            .ToListAsync(cancellationToken);
 
-        decimal currentQuantity = 0;
-        foreach (var sm in currentStockMovements)
+        decimal onHandStock = 0m;
+        foreach (var m in allMovements)
         {
-            if (sm.MovementType == StockMovementType.InboundReceipt ||
-                sm.MovementType == StockMovementType.TransferIn ||
-                sm.MovementType == StockMovementType.InventoryAdjustment)
-            {
-                currentQuantity += sm.Quantity;
-            }
-            else
-            {
-                currentQuantity -= sm.Quantity;
-            }
+            onHandStock += (m.MovementType == StockMovementType.InboundReceipt ||
+                            m.MovementType == StockMovementType.TransferIn ||
+                            m.MovementType == StockMovementType.InventoryAdjustment)
+                ? m.Quantity
+                : -m.Quantity;
         }
 
-        // Warn if stockout risk (e.g., current stock covers less than 14 days of predicted demand)
-        var demandNext14Days = predictedDemand.Take(14).Sum();
-        bool stockoutWarning = currentQuantity < demandNext14Days;
+        onHandStock = Math.Max(0m, onHandStock);
 
-        return new ProductDemandForecastDto(productId, warehouseId, predictedDemand, stockoutWarning);
+        // ── 6. Evaluate stockout risk ─────────────────────────────
+        // Walk the forecast day-by-day to find when cumulative demand exceeds stock.
+        var (isStockoutRisk, daysUntilStockout) = CalculateStockoutRisk(
+            onHandStock, predicted, horizonDays);
+
+        _logger.LogInformation(
+            "Forecast complete — StockoutRisk={Risk}, DaysUntilStockout={Days}",
+            isStockoutRisk, daysUntilStockout);
+
+        return new InventoryForecastResultDto(
+            ProductId: productId,
+            WarehouseId: warehouseId,
+            ForecastedValues: predicted,
+            LowerBoundConfidence: lower,
+            UpperBoundConfidence: upper,
+            IsStockoutRisk: isStockoutRisk,
+            DaysUntilStockout: daysUntilStockout);
+    }
+
+    // ──────────────────────────────────────────────────────────────
+    // Legacy overload (backward compat for existing callers)
+    // ──────────────────────────────────────────────────────────────
+
+    /// <inheritdoc/>
+    public async Task<ProductDemandForecastDto> GenerateForecastAsync(
+        Guid productId,
+        Guid warehouseId,
+        int horizonDays = 30)
+    {
+        var result = await ForecastProductDemandAsync(
+            productId, warehouseId, horizonDays, CancellationToken.None);
+
+        var legacyDemand = result.ForecastedValues
+            .Select(f => (decimal)Math.Max(0f, f))
+            .ToArray();
+
+        return new ProductDemandForecastDto(
+            productId,
+            warehouseId,
+            legacyDemand,
+            result.IsStockoutRisk);
+    }
+
+    // ──────────────────────────────────────────────────────────────
+    // Private helpers
+    // ──────────────────────────────────────────────────────────────
+
+    private static IReadOnlyList<float> NormalizeFloatArray(float[]? source, int length)
+    {
+        if (source is null || source.Length == 0)
+            return new float[length];
+
+        // Clamp negative forecasted quantities to 0 (demand cannot be negative).
+        var result = new float[length];
+        for (int i = 0; i < length && i < source.Length; i++)
+            result[i] = Math.Max(0f, source[i]);
+
+        return result;
+    }
+
+    private static (bool IsRisk, int Days) CalculateStockoutRisk(
+        decimal onHand, IReadOnlyList<float> dailyForecast, int horizon)
+    {
+        decimal running = onHand;
+        for (int day = 0; day < horizon; day++)
+        {
+            running -= (decimal)dailyForecast[day];
+            if (running <= 0m)
+                return (true, day + 1);
+        }
+        return (false, horizon);
+    }
+
+    private static InventoryForecastResultDto BuildEmptyForecast(
+        Guid productId, Guid warehouseId, int horizonDays)
+    {
+        var zeros = new float[horizonDays];
+        return new InventoryForecastResultDto(
+            ProductId: productId,
+            WarehouseId: warehouseId,
+            ForecastedValues: zeros,
+            LowerBoundConfidence: zeros,
+            UpperBoundConfidence: zeros,
+            IsStockoutRisk: false,
+            DaysUntilStockout: horizonDays);
     }
 }

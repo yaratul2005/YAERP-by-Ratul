@@ -27,7 +27,11 @@ public class RoleConfiguration : IEntityTypeConfiguration<Role>
         builder.Property(r => r.Permissions)
             .HasConversion(
                 v => JsonSerializer.Serialize(v, (JsonSerializerOptions?)null),
-                v => JsonSerializer.Deserialize<List<string>>(v, (JsonSerializerOptions?)null) ?? new List<string>());
+                v => JsonSerializer.Deserialize<List<string>>(v, (JsonSerializerOptions?)null) ?? new List<string>(),
+                new Microsoft.EntityFrameworkCore.ChangeTracking.ValueComparer<List<string>>(
+                    (c1, c2) => c1 != null && c2 != null && c1.SequenceEqual(c2),
+                    c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),
+                    c => c.ToList()));
 
         builder.HasIndex(r => new { r.TenantId, r.Name }).IsUnique();
     }

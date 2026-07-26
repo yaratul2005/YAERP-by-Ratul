@@ -1,13 +1,11 @@
-// Zero Code-Behind Rule
-using YAERP.UI.ViewModels;
+using System.Windows.Controls;
 
 namespace YAERP.UI.Views;
 
-public partial class FinanceView
+public partial class FinanceView : UserControl
 {
-    public FinanceView(FinanceViewModel viewModel)
+    public FinanceView()
     {
-        DataContext = viewModel;
+        InitializeComponent();
     }
-    public object DataContext { get; set; } = default!;
 }

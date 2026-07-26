@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using YAERP.Application.Common.Interfaces;
+using YAERP.Domain.Entities;
 using YAERP.Domain.Identity;
 using YAERP.Domain.Inventory;
 using YAERP.Domain.Purchasing;
@@ -14,25 +15,32 @@ public class YAERPDbContext : DbContext, IApplicationDbContext
 {
     private readonly ITenantContext _tenantContext;
     private readonly AuditSaveInterceptor _auditSaveInterceptor;
+    private readonly SyncOutboxInterceptor _syncOutboxInterceptor;
 
     public YAERPDbContext(
         DbContextOptions<YAERPDbContext> options,
         ITenantContext tenantContext,
-        AuditSaveInterceptor auditSaveInterceptor) : base(options)
+        AuditSaveInterceptor auditSaveInterceptor,
+        SyncOutboxInterceptor syncOutboxInterceptor) : base(options)
     {
         _tenantContext = tenantContext;
         _auditSaveInterceptor = auditSaveInterceptor;
+        _syncOutboxInterceptor = syncOutboxInterceptor;
     }
 
     public DbSet<Tenant> Tenants => Set<Tenant>();
     public DbSet<User> Users => Set<User>();
     public DbSet<Role> Roles => Set<Role>();
     public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
+    public DbSet<SyncQueueItem> SyncQueueItems => Set<SyncQueueItem>();
+    public DbSet<ApprovalRequest> ApprovalRequests => Set<ApprovalRequest>();
+    public DbSet<ApprovalStepLog> ApprovalStepLogs => Set<ApprovalStepLog>();
 
     public DbSet<Product> Products => Set<Product>();
     public DbSet<Warehouse> Warehouses => Set<Warehouse>();
     public DbSet<ProductCategory> ProductCategories => Set<ProductCategory>();
     public DbSet<StockMovement> StockMovements => Set<StockMovement>();
+    public DbSet<UnitOfMeasure> UnitsOfMeasure => Set<UnitOfMeasure>();
 
     public DbSet<Vendor> Vendors => Set<Vendor>();
     public DbSet<PurchaseOrder> PurchaseOrders => Set<PurchaseOrder>();
@@ -81,7 +89,7 @@ public class YAERPDbContext : DbContext, IApplicationDbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        optionsBuilder.AddInterceptors(_auditSaveInterceptor);
+        optionsBuilder.AddInterceptors(_auditSaveInterceptor, _syncOutboxInterceptor);
         base.OnConfiguring(optionsBuilder);
     }
 }

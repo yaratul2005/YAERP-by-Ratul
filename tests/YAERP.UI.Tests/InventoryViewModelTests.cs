@@ -18,7 +18,7 @@ public class InventoryViewModelTests
         Assert.Empty(viewModel.Products);
 
         // Act
-        await viewModel.LoadProductsAsyncCommand.ExecuteAsync(null);
+        await viewModel.LoadProductsCommand.ExecuteAsync(null);
 
         // Assert
         Assert.NotEmpty(viewModel.Products);

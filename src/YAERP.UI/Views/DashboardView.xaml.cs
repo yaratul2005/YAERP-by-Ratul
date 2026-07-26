@@ -1,13 +1,11 @@
-// Zero Code-Behind Rule
-using YAERP.UI.ViewModels;
+using System.Windows.Controls;
 
 namespace YAERP.UI.Views;
 
-public partial class DashboardView
+public partial class DashboardView : UserControl
 {
-    public DashboardView(DashboardViewModel viewModel)
+    public DashboardView()
     {
-        DataContext = viewModel;
+        InitializeComponent();
     }
-    public object DataContext { get; set; } = default!;
 }

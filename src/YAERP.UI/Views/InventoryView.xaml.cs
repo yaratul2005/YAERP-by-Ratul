@@ -1,13 +1,11 @@
-// Zero Code-Behind Rule
-using YAERP.UI.ViewModels;
+using System.Windows.Controls;
 
 namespace YAERP.UI.Views;
 
-public partial class InventoryView
+public partial class InventoryView : UserControl
 {
-    public InventoryView(InventoryViewModel viewModel)
+    public InventoryView()
     {
-        DataContext = viewModel;
+        InitializeComponent();
     }
-    public object DataContext { get; set; } = default!;
 }

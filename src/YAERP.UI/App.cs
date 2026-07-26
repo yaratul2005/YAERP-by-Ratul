@@ -1,6 +1,8 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Threading;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -9,24 +11,33 @@ using Serilog.Events;
 using YAERP.Application;
 using YAERP.Application.Common.Interfaces;
 using YAERP.Infrastructure;
+using YAERP.Infrastructure.Hardware;
 using YAERP.UI.Services;
 using YAERP.UI.ViewModels;
+using YAERP.UI.Views;
 
 namespace YAERP.UI;
 
-// Simulating App.xaml.cs for dependency injection setup without WPF SDK
-public class App
+public partial class App : System.Windows.Application
 {
     public static IHost? AppHost { get; private set; }
 
     public App()
     {
-        // Global exception handling
+        InitializeComponent();
+
+        // Prevent WPF from shutting down during async OnStartup before MainWindow is shown
+        ShutdownMode = ShutdownMode.OnExplicitShutdown;
+
+        // Global domain exception handling
         AppDomain.CurrentDomain.UnhandledException += (s, e) =>
         {
-            Log.Fatal(e.ExceptionObject as Exception, "A fatal unhandled exception occurred.");
+            Log.Fatal(e.ExceptionObject as Exception, "A fatal unhandled domain exception occurred.");
             Log.CloseAndFlush();
         };
+
+        // Dispatcher unhandled exception handling to catch UI thread exceptions and prevent silent app crashes
+        DispatcherUnhandledException += OnDispatcherUnhandledException;
 
         // Configure Serilog
         Log.Logger = new LoggerConfiguration()
@@ -43,18 +54,22 @@ public class App
             Log.Information("Starting application host...");
 
             AppHost = Host.CreateDefaultBuilder()
-                .UseSerilog() // Wire up Serilog into Microsoft.Extensions.Logging
+                .UseSerilog()
                 .ConfigureServices((context, services) =>
                 {
-                    // For mock tenant logic in a desktop app, we can register a fake one if needed
                     services.AddSingleton<ITenantContext, MockTenantContext>();
 
                     // Register Layers
                     services.AddApplication();
                     services.AddInfrastructure(context.Configuration);
 
-                    // Register Navigation
+                    // Register Hardware Helpers
+                    services.AddSingleton<BarcodeScannerListener>();
+
+                    // Register Navigation & Main Window & Modal Service
                     services.AddSingleton<INavigationService, NavigationService>();
+                    services.AddSingleton<IModalService, ModalService>();
+                    services.AddSingleton<MainWindow>();
 
                     // Register ViewModels
                     services.AddSingleton<MainViewModel>();
@@ -62,6 +77,9 @@ public class App
                     services.AddTransient<InventoryViewModel>();
                     services.AddTransient<SalesViewModel>();
                     services.AddTransient<FinanceViewModel>();
+                    services.AddTransient<PosViewModel>();
+                    services.AddTransient<ApprovalCenterViewModel>();
+                    services.AddTransient<PluginHubViewModel>();
                 })
                 .Build();
         }
@@ -70,6 +88,12 @@ public class App
             Log.Fatal(ex, "Host terminated unexpectedly");
             throw;
         }
+    }
+
+    private void OnDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
+    {
+        Log.Error(e.Exception, "An unhandled UI Dispatcher exception occurred.");
+        e.Handled = true;
     }
 
     public async Task StartAsync(CancellationToken cancellationToken = default)
@@ -83,16 +107,44 @@ public class App
         await AppHost!.StartAsync(cancellationToken);
     }
 
-    public async Task StopAsync(CancellationToken cancellationToken = default)
+    protected override async void OnStartup(StartupEventArgs e)
     {
-        await AppHost!.StopAsync(cancellationToken);
+        base.OnStartup(e);
+
+        try
+        {
+            await StartAsync();
+
+            var mainWindow = AppHost!.Services.GetRequiredService<MainWindow>();
+            mainWindow.Show();
+            this.MainWindow = mainWindow;
+
+            // Re-enable automatic shutdown when main window closes
+            this.ShutdownMode = ShutdownMode.OnMainWindowClose;
+        }
+        catch (Exception ex)
+        {
+            Log.Fatal(ex, "Application Startup Failed");
+            MessageBox.Show($"Application Startup Failed: {ex.Message}", "YAERP Startup Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            Shutdown(-1);
+        }
+    }
+
+    protected override async void OnExit(ExitEventArgs e)
+    {
+        if (AppHost != null)
+        {
+            await AppHost.StopAsync();
+            AppHost.Dispose();
+        }
+
         Log.CloseAndFlush();
+        base.OnExit(e);
     }
 }
 
-// Temporary to compile
 public class MockTenantContext : ITenantContext
 {
-    public YAERP.Domain.Identity.TenantId? CurrentTenantId => null; // Mock
+    public YAERP.Domain.Identity.TenantId? CurrentTenantId => null;
     public YAERP.Domain.Identity.UserId? CurrentUserId => null;
 }

@@ -1,13 +1,11 @@
-// Zero Code-Behind Rule
-using YAERP.UI.ViewModels;
+using System.Windows.Controls;
 
 namespace YAERP.UI.Views;
 
-public partial class SalesView
+public partial class SalesView : UserControl
 {
-    public SalesView(SalesViewModel viewModel)
+    public SalesView()
     {
-        DataContext = viewModel;
+        InitializeComponent();
     }
-    public object DataContext { get; set; } = default!;
 }

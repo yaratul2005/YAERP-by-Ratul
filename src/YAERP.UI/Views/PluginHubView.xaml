@@ -1,0 +1,75 @@
+<UserControl x:Class="YAERP.UI.Views.PluginHubView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Background="{StaticResource BackgroundCanvasBrush}">
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+    </UserControl.Resources>
+
+    <Grid Margin="10">
+        <DockPanel>
+            <!-- Header Bar -->
+            <StackPanel DockPanel.Dock="Top" Margin="0,0,0,16">
+                <DockPanel>
+                    <StackPanel DockPanel.Dock="Left">
+                        <TextBlock Text="Dynamic Extensibility &amp; Plugin Management Hub" FontSize="26" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}"/>
+                        <TextBlock Text="Isolated AssemblyLoadContext runtime module loader &amp; external extension registry" FontSize="13" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,4,0,0"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                        <Button Content="📁  Open Plugins Directory" Command="{Binding OpenPluginsDirectoryCommand}" Padding="10,6" MinHeight="36" Background="#F1F5F9" Foreground="#1E293B" FontWeight="Bold" BorderThickness="0" Cursor="Hand" Margin="0,0,8,0"/>
+                        <Button Content="🔄 Reload Plugins" Command="{Binding RefreshPluginsCommand}" Padding="10,6" MinHeight="36" Background="#2563EB" Foreground="#FFFFFF" FontWeight="Bold" BorderThickness="0" Cursor="Hand"/>
+                    </StackPanel>
+                </DockPanel>
+
+                <!-- System Status Banner -->
+                <Border Background="#F8FAFC" BorderBrush="{StaticResource BorderSubtleBrush}" BorderThickness="1" CornerRadius="8" Padding="12,8" Margin="0,12,0,0"
+                        Visibility="{Binding StatusMessage, Converter={StaticResource BoolToVis}}">
+                    <TextBlock Text="{Binding StatusMessage}" FontSize="13" FontWeight="Bold" Foreground="#2563EB"/>
+                </Border>
+            </StackPanel>
+
+            <!-- Plugin Cards ItemsControl -->
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <ItemsControl ItemsSource="{Binding ActivePlugins}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel Orientation="Horizontal"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border Style="{StaticResource ModernCard}" Width="380" Margin="0,0,14,14" Padding="16">
+                                <StackPanel>
+                                    <DockPanel Margin="0,0,0,8">
+                                        <TextBlock Text="{Binding Name}" FontSize="16" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}"/>
+                                        <Border Background="#D1FAE5" BorderBrush="#34D399" BorderThickness="1" CornerRadius="4" Padding="6,2" HorizontalAlignment="Right">
+                                            <TextBlock Text="● Active Runtime" FontSize="10" FontWeight="Bold" Foreground="#065F46"/>
+                                        </Border>
+                                    </DockPanel>
+
+                                    <DockPanel Margin="0,4">
+                                        <TextBlock Text="Version:" Foreground="{StaticResource TextSecondaryBrush}" FontSize="12"/>
+                                        <TextBlock Text="{Binding Version}" FontWeight="Bold" FontSize="12" HorizontalAlignment="Right"/>
+                                    </DockPanel>
+
+                                    <DockPanel Margin="0,4">
+                                        <TextBlock Text="Author:" Foreground="{StaticResource TextSecondaryBrush}" FontSize="12"/>
+                                        <TextBlock Text="{Binding Author}" FontWeight="Bold" FontSize="12" HorizontalAlignment="Right"/>
+                                    </DockPanel>
+
+                                    <DockPanel Margin="0,4">
+                                        <TextBlock Text="Plugin ID:" Foreground="{StaticResource TextSecondaryBrush}" FontSize="12"/>
+                                        <TextBlock Text="{Binding PluginId}" FontFamily="Consolas" FontSize="11" Foreground="#475569" HorizontalAlignment="Right"/>
+                                    </DockPanel>
+
+                                    <Separator Background="{StaticResource BorderSubtleBrush}" Margin="0,8"/>
+                                    <TextBlock Text="Isolation Level: Collectible AssemblyLoadContext" FontSize="11" Foreground="#64748B" HorizontalAlignment="Center"/>
+                                </StackPanel>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+        </DockPanel>
+    </Grid>
+</UserControl>

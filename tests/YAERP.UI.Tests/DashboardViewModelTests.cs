@@ -19,7 +19,7 @@ public class DashboardViewModelTests
         Assert.Equal(0, viewModel.TotalSales);
 
         // Act
-        var loadTask = viewModel.LoadMetricsAsyncCommand.ExecuteAsync(null);
+        var loadTask = viewModel.LoadMetricsCommand.ExecuteAsync(null);
 
         Assert.True(viewModel.IsBusy);
 

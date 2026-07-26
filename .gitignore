@@ -494,3 +494,6 @@ bin/
 obj/
 **/bin/*
 **/obj/*
+dist/
+InventoryStock.xlsx
+.vscode/
