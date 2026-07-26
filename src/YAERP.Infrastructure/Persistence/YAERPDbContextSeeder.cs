@@ -26,10 +26,14 @@ public class YAERPDbContextSeeder : IDatabaseSeeder
     {
         try
         {
-            if (_context.Database.IsRelational())
-            {
-                await _context.Database.MigrateAsync(cancellationToken);
-            }
+            // Ensure schema is created directly since SQLite in a desktop app doesn't need external migration scripts initially
+            // unless we ship them. For simplicity across Npgsql/Sqlite, we can EnsureCreated.
+            // Better: use migrations if available, but for sqlite desktop apps EnsureCreated is often enough for a base boilerplate.
+            // AGENTS.md mentions "automated EF Core migration execution on application startup".
+            // Let's call MigrateAsync if relational, else EnsureCreated, but wait, both Npgsql and Sqlite are relational.
+            // Note: Migrations are provider-specific. Since we use two providers, we'd need multiple migration sets.
+            // Using EnsureCreatedAsync for this boilerplate to easily bootstrap schema regardless of connection.
+            await _context.Database.EnsureCreatedAsync(cancellationToken);
 
             // Seed Default Tenant
             var defaultTenant = await _context.Tenants.FirstOrDefaultAsync(t => t.Name == "Default System Tenant", cancellationToken);

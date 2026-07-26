@@ -1,0 +1,60 @@
+name: Build and Release YAERP
+
+on:
+  push:
+    branches: [ "main" ]
+  release:
+    types: [ created ]
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.0.x
+
+    - name: Restore dependencies
+      run: dotnet restore YAERP.slnx
+
+    - name: Build
+      run: dotnet build YAERP.slnx --configuration Release --no-restore
+
+    - name: Test
+      run: dotnet test YAERP.slnx --configuration Release --no-build --verbosity normal
+
+    - name: Publish Self-Contained x64
+      run: dotnet publish src/YAERP.UI/YAERP.UI.csproj -p:PublishProfile=win-x64-standalone
+
+    - name: Upload Build Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: YAERP-win-x64
+        path: src/YAERP.UI/bin/Release/net8.0/win-x64/publish/
+
+  release:
+    needs: build
+    if: github.event_name == 'release'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download Build Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: YAERP-win-x64
+          path: ./publish
+
+      - name: Zip Artifacts
+        run: zip -r YAERP-v1.0-win-x64.zip ./publish
+
+      - name: Upload Release Asset
+        uses: softprops/action-gh-release@v1
+        with:
+          files: YAERP-v1.0-win-x64.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

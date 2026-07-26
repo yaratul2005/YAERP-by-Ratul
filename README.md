@@ -41,3 +41,12 @@ An enterprise-grade, high-performance, modular ERP suite designed natively for d
    dotnet run --project src/YAERP.UI/YAERP.UI.csproj
    ```
    *Note: Upon startup, the database seeder automatically initializes the core Tenant, System Admin, Chart of Accounts, and base Unit of Measures.*
+
+## Downloading & Installing
+To get started with YAERP as an end-user:
+
+1. Navigate to the **Releases** page on this GitHub repository.
+2. Download the latest `YAERP-v1.0-win-x64.zip` asset.
+3. Extract the ZIP file into your desired directory.
+4. Run `YAERP.UI.exe`. No .NET installation is required because the application is fully self-contained!
+5. Upon first execution, YAERP will automatically generate a local `yaerp_local.db` SQLite database inside `%LocalAppData%/YAERP/` if a PostgreSQL connection string isn't provided. Default admin and base data are seeded instantly.

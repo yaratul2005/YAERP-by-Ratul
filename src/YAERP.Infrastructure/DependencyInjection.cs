@@ -1,3 +1,5 @@
+using System;
+using System.IO;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -15,18 +17,26 @@ public static class DependencyInjection
     {
         services.AddScoped<AuditSaveInterceptor>();
 
-        // Ensure to fallback to in memory or sqlite if no connection string is found for testing.
         var connectionString = configuration.GetConnectionString("DefaultConnection");
 
         services.AddDbContext<YAERPDbContext>((sp, options) =>
         {
-            if (!string.IsNullOrEmpty(connectionString))
+            if (!string.IsNullOrWhiteSpace(connectionString))
             {
                 options.UseNpgsql(connectionString);
             }
             else
             {
-                options.UseInMemoryDatabase("YAERP_Db");
+                var appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+                var appFolder = Path.Combine(appDataPath, "YAERP");
+
+                if (!Directory.Exists(appFolder))
+                {
+                    Directory.CreateDirectory(appFolder);
+                }
+
+                var dbPath = Path.Combine(appFolder, "yaerp_local.db");
+                options.UseSqlite($"Data Source={dbPath}");
             }
         });
 
