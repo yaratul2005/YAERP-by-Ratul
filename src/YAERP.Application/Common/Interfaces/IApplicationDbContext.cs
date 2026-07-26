@@ -3,6 +3,8 @@ using YAERP.Domain.Identity;
 using YAERP.Domain.Inventory;
 using YAERP.Domain.Purchasing;
 using YAERP.Domain.Sales;
+using YAERP.Domain.Finance;
+using YAERP.Domain.HR;
 
 namespace YAERP.Application.Common.Interfaces;
 
@@ -23,6 +25,13 @@ public interface IApplicationDbContext
 
     DbSet<Customer> Customers { get; }
     DbSet<SalesOrder> SalesOrders { get; }
+
+    DbSet<Account> Accounts { get; }
+    DbSet<JournalEntry> JournalEntries { get; }
+    DbSet<Invoice> Invoices { get; }
+
+    DbSet<Employee> Employees { get; }
+    DbSet<Payroll> Payrolls { get; }
 
     Task<int> SaveChangesAsync(System.Threading.CancellationToken cancellationToken = default);
 }

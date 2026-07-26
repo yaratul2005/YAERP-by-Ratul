@@ -488,3 +488,9 @@ $RECYCLE.BIN/
 [Oo]bj/
 bin/
 obj/
+[Bb]in/
+[Oo]bj/
+bin/
+obj/
+**/bin/*
+**/obj/*

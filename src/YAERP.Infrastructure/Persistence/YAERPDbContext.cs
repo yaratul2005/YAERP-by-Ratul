@@ -4,6 +4,8 @@ using YAERP.Domain.Identity;
 using YAERP.Domain.Inventory;
 using YAERP.Domain.Purchasing;
 using YAERP.Domain.Sales;
+using YAERP.Domain.Finance;
+using YAERP.Domain.HR;
 using YAERP.Infrastructure.Persistence.Interceptors;
 
 namespace YAERP.Infrastructure.Persistence;
@@ -38,6 +40,13 @@ public class YAERPDbContext : DbContext, IApplicationDbContext
     public DbSet<Customer> Customers => Set<Customer>();
     public DbSet<SalesOrder> SalesOrders => Set<SalesOrder>();
 
+    public DbSet<Account> Accounts => Set<Account>();
+    public DbSet<JournalEntry> JournalEntries => Set<JournalEntry>();
+    public DbSet<Invoice> Invoices => Set<Invoice>();
+
+    public DbSet<Employee> Employees => Set<Employee>();
+    public DbSet<Payroll> Payrolls => Set<Payroll>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(YAERPDbContext).Assembly);
@@ -59,6 +68,13 @@ public class YAERPDbContext : DbContext, IApplicationDbContext
 
         modelBuilder.Entity<Customer>().HasQueryFilter(x => x.TenantId == tenantId);
         modelBuilder.Entity<SalesOrder>().HasQueryFilter(x => x.TenantId == tenantId);
+
+        modelBuilder.Entity<Account>().HasQueryFilter(x => x.TenantId == tenantId);
+        modelBuilder.Entity<JournalEntry>().HasQueryFilter(x => x.TenantId == tenantId);
+        modelBuilder.Entity<Invoice>().HasQueryFilter(x => x.TenantId == tenantId);
+
+        modelBuilder.Entity<Employee>().HasQueryFilter(x => x.TenantId == tenantId);
+        modelBuilder.Entity<Payroll>().HasQueryFilter(x => x.TenantId == tenantId);
 
         base.OnModelCreating(modelBuilder);
     }
