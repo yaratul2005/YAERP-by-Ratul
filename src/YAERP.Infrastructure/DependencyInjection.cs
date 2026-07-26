@@ -5,9 +5,11 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using YAERP.Application.Common.Interfaces;
 using YAERP.Application.Common.Interfaces.Reporting;
+using YAERP.Application.Common.Interfaces.AI;
 using YAERP.Infrastructure.Persistence;
 using YAERP.Infrastructure.Persistence.Interceptors;
 using YAERP.Infrastructure.Reporting;
+using YAERP.Infrastructure.AI.Services;
 
 namespace YAERP.Infrastructure;
 
@@ -45,6 +47,8 @@ public static class DependencyInjection
 
         services.AddSingleton<IPdfReportGenerator, QuestPdfReportGenerator>();
         services.AddSingleton<IExcelExporter, ClosedXmlExporter>();
+
+        services.AddScoped<IInventoryForecastingService, InventoryForecastingService>();
 
         return services;
     }

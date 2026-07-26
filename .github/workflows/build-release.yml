@@ -31,6 +31,9 @@ jobs:
     - name: Publish Self-Contained x64
       run: dotnet publish src/YAERP.UI/YAERP.UI.csproj -p:PublishProfile=win-x64-standalone
 
+    - name: Rename Executable for Clarity
+      run: Rename-Item -Path "src\YAERP.UI\bin\Release\net8.0\win-x64\publish\YAERP.UI.exe" -NewName "YAERP.exe"
+
     - name: Upload Build Artifacts
       uses: actions/upload-artifact@v4
       with:

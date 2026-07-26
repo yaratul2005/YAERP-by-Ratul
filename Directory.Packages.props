@@ -26,5 +26,7 @@
     <PackageVersion Include="Serilog.Sinks.File" Version="5.0.0" />
     <PackageVersion Include="Serilog.Sinks.Console" Version="5.0.1" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.10" />
+    <PackageVersion Include="Microsoft.ML" Version="3.0.1" />
+    <PackageVersion Include="Microsoft.ML.TimeSeries" Version="3.0.1" />
   </ItemGroup>
 </Project>
