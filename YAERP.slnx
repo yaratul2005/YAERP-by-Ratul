@@ -9,6 +9,7 @@
     <Project Path="tests/YAERP.Application.Tests/YAERP.Application.Tests.csproj" />
     <Project Path="tests/YAERP.Architecture.Tests/YAERP.Architecture.Tests.csproj" />
     <Project Path="tests/YAERP.Domain.Tests/YAERP.Domain.Tests.csproj" />
+    <Project Path="tests/YAERP.Infrastructure.Tests/YAERP.Infrastructure.Tests.csproj" />
     <Project Path="tests/YAERP.UI.Tests/YAERP.UI.Tests.csproj" />
   </Folder>
 </Solution>

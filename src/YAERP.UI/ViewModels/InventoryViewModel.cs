@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MediatR;
-using YAERP.Application.Inventory.Queries.GetProductStock;
+using YAERP.Application.Inventory.Commands.ExportInventoryExcel;
 
 namespace YAERP.UI.ViewModels;
 
@@ -40,7 +40,16 @@ public partial class InventoryViewModel : ObservableObject
     [RelayCommand]
     private async Task CreateProductAsync()
     {
-        // Call MediatR command here
         await Task.CompletedTask;
+    }
+
+    [RelayCommand]
+    private async Task ExportToExcelAsync()
+    {
+        var result = await _mediator.Send(new ExportInventoryExcelCommand());
+        if (result.IsSuccess)
+        {
+            await System.IO.File.WriteAllBytesAsync("InventoryStock.xlsx", result.Value);
+        }
     }
 }
