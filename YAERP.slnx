@@ -1,0 +1,13 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/YAERP.Application/YAERP.Application.csproj" />
+    <Project Path="src/YAERP.Domain/YAERP.Domain.csproj" />
+    <Project Path="src/YAERP.Infrastructure/YAERP.Infrastructure.csproj" />
+    <Project Path="src/YAERP.UI/YAERP.UI.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/YAERP.Application.Tests/YAERP.Application.Tests.csproj" />
+    <Project Path="tests/YAERP.Architecture.Tests/YAERP.Architecture.Tests.csproj" />
+    <Project Path="tests/YAERP.Domain.Tests/YAERP.Domain.Tests.csproj" />
+  </Folder>
+</Solution>
