@@ -1,0 +1,25 @@
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using YAERP.Domain.Identity;
+
+namespace YAERP.Infrastructure.Persistence.Configurations;
+
+public class TenantConfiguration : IEntityTypeConfiguration<Tenant>
+{
+    public void Configure(EntityTypeBuilder<Tenant> builder)
+    {
+        builder.ToTable("Tenants");
+
+        builder.HasKey(t => t.Id);
+
+        builder.Property(t => t.Id)
+            .HasConversion(id => id.Value, value => new TenantId(value));
+
+        builder.Property(t => t.Name)
+            .IsRequired()
+            .HasMaxLength(200);
+
+        builder.Property(t => t.ConnectionString)
+            .HasMaxLength(500);
+    }
+}
