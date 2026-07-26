@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using YAERP.Domain.Identity;
 using YAERP.Domain.Inventory;
+using YAERP.Domain.Purchasing;
+using YAERP.Domain.Sales;
 
 namespace YAERP.Application.Common.Interfaces;
 
@@ -16,5 +18,11 @@ public interface IApplicationDbContext
     DbSet<ProductCategory> ProductCategories { get; }
     DbSet<StockMovement> StockMovements { get; }
 
-    Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
+    DbSet<Vendor> Vendors { get; }
+    DbSet<PurchaseOrder> PurchaseOrders { get; }
+
+    DbSet<Customer> Customers { get; }
+    DbSet<SalesOrder> SalesOrders { get; }
+
+    Task<int> SaveChangesAsync(System.Threading.CancellationToken cancellationToken = default);
 }

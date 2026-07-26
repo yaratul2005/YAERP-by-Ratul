@@ -2,6 +2,8 @@ using Microsoft.EntityFrameworkCore;
 using YAERP.Application.Common.Interfaces;
 using YAERP.Domain.Identity;
 using YAERP.Domain.Inventory;
+using YAERP.Domain.Purchasing;
+using YAERP.Domain.Sales;
 using YAERP.Infrastructure.Persistence.Interceptors;
 
 namespace YAERP.Infrastructure.Persistence;
@@ -30,6 +32,12 @@ public class YAERPDbContext : DbContext, IApplicationDbContext
     public DbSet<ProductCategory> ProductCategories => Set<ProductCategory>();
     public DbSet<StockMovement> StockMovements => Set<StockMovement>();
 
+    public DbSet<Vendor> Vendors => Set<Vendor>();
+    public DbSet<PurchaseOrder> PurchaseOrders => Set<PurchaseOrder>();
+
+    public DbSet<Customer> Customers => Set<Customer>();
+    public DbSet<SalesOrder> SalesOrders => Set<SalesOrder>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(YAERPDbContext).Assembly);
@@ -45,6 +53,12 @@ public class YAERPDbContext : DbContext, IApplicationDbContext
         modelBuilder.Entity<Warehouse>().HasQueryFilter(x => x.TenantId == tenantId);
         modelBuilder.Entity<ProductCategory>().HasQueryFilter(x => x.TenantId == tenantId);
         modelBuilder.Entity<StockMovement>().HasQueryFilter(x => x.TenantId == tenantId);
+
+        modelBuilder.Entity<Vendor>().HasQueryFilter(x => x.TenantId == tenantId);
+        modelBuilder.Entity<PurchaseOrder>().HasQueryFilter(x => x.TenantId == tenantId);
+
+        modelBuilder.Entity<Customer>().HasQueryFilter(x => x.TenantId == tenantId);
+        modelBuilder.Entity<SalesOrder>().HasQueryFilter(x => x.TenantId == tenantId);
 
         base.OnModelCreating(modelBuilder);
     }

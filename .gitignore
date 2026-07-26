@@ -480,3 +480,11 @@ $RECYCLE.BIN/
 
 # Vim temporary swap files
 *.swp
+
+# ignore all bin and obj folders for diff limits
+[Bb]in/
+[Oo]bj/
+[Bb]in/
+[Oo]bj/
+bin/
+obj/
