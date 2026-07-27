@@ -8,6 +8,7 @@ using YAERP.Domain.Purchasing;
 using YAERP.Domain.Sales;
 using YAERP.Domain.Finance;
 using YAERP.Domain.HR;
+using YAERP.Domain.Entities.Financials;
 using YAERP.Domain.Entities.Manufacturing;
 using YAERP.Domain.Entities.Warehouse;
 
@@ -51,6 +52,11 @@ public interface IApplicationDbContext
     DbSet<InventoryLot> InventoryLots { get; }
     DbSet<ProductSerialNumber> ProductSerialNumbers { get; }
     DbSet<InventoryCostLayer> InventoryCostLayers { get; }
+    DbSet<FixedAsset> FixedAssets { get; }
+    DbSet<DepreciationScheduleEntry> DepreciationScheduleEntries { get; }
+    DbSet<Currency> Currencies { get; }
+    DbSet<ExchangeRate> ExchangeRates { get; }
+    DbSet<TaxRule> TaxRules { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken);
     DbSet<TEntity> Set<TEntity>() where TEntity : class;

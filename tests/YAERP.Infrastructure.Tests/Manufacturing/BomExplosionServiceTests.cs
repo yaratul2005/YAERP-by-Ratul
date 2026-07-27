@@ -50,6 +50,12 @@ public class TestBomDbContext : DbContext, IApplicationDbContext
         modelBuilder.Ignore<YAERP.Domain.Finance.Invoice>();
         modelBuilder.Ignore<YAERP.Domain.HR.Employee>();
         modelBuilder.Ignore<YAERP.Domain.HR.Payroll>();
+
+        modelBuilder.Ignore<YAERP.Domain.Entities.Financials.FixedAsset>();
+        modelBuilder.Ignore<YAERP.Domain.Entities.Financials.DepreciationScheduleEntry>();
+        modelBuilder.Ignore<YAERP.Domain.Entities.Financials.Currency>();
+        modelBuilder.Ignore<YAERP.Domain.Entities.Financials.ExchangeRate>();
+        modelBuilder.Ignore<YAERP.Domain.Entities.Financials.TaxRule>();
         base.OnModelCreating(modelBuilder);
     }
 
@@ -74,6 +80,12 @@ public class TestBomDbContext : DbContext, IApplicationDbContext
     public DbSet<YAERP.Domain.Finance.Invoice> Invoices => throw new NotImplementedException();
     public DbSet<YAERP.Domain.HR.Employee> Employees => throw new NotImplementedException();
     public DbSet<YAERP.Domain.HR.Payroll> Payrolls => throw new NotImplementedException();
+    public DbSet<YAERP.Domain.Entities.Financials.FixedAsset> FixedAssets => throw new NotImplementedException();
+    public DbSet<YAERP.Domain.Entities.Financials.DepreciationScheduleEntry> DepreciationScheduleEntries => throw new NotImplementedException();
+    public DbSet<YAERP.Domain.Entities.Financials.Currency> Currencies => throw new NotImplementedException();
+    public DbSet<YAERP.Domain.Entities.Financials.ExchangeRate> ExchangeRates => throw new NotImplementedException();
+    public DbSet<YAERP.Domain.Entities.Financials.TaxRule> TaxRules => throw new NotImplementedException();
+
     public DbSet<YAERP.Domain.Entities.Warehouse.WarehouseZone> WarehouseZones => throw new NotImplementedException();
     public DbSet<YAERP.Domain.Entities.Warehouse.WarehouseBin> WarehouseBins => throw new NotImplementedException();
     public DbSet<YAERP.Domain.Entities.Warehouse.InventoryLot> InventoryLots => throw new NotImplementedException();

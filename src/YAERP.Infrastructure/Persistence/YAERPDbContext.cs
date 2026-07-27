@@ -7,6 +7,7 @@ using YAERP.Domain.Purchasing;
 using YAERP.Domain.Sales;
 using YAERP.Domain.Finance;
 using YAERP.Domain.HR;
+using YAERP.Domain.Entities.Financials;
 using YAERP.Domain.Entities.Manufacturing;
 using YAERP.Domain.Entities.Warehouse;
 using YAERP.Infrastructure.Persistence.Interceptors;
@@ -66,6 +67,11 @@ public class YAERPDbContext : DbContext, IApplicationDbContext
     public DbSet<InventoryLot> InventoryLots => Set<InventoryLot>();
     public DbSet<ProductSerialNumber> ProductSerialNumbers => Set<ProductSerialNumber>();
     public DbSet<InventoryCostLayer> InventoryCostLayers => Set<InventoryCostLayer>();
+    public DbSet<FixedAsset> FixedAssets => Set<FixedAsset>();
+    public DbSet<DepreciationScheduleEntry> DepreciationScheduleEntries => Set<DepreciationScheduleEntry>();
+    public DbSet<Currency> Currencies => Set<Currency>();
+    public DbSet<ExchangeRate> ExchangeRates => Set<ExchangeRate>();
+    public DbSet<TaxRule> TaxRules => Set<TaxRule>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -96,6 +102,9 @@ public class YAERPDbContext : DbContext, IApplicationDbContext
         modelBuilder.Entity<Employee>().HasQueryFilter(x => x.TenantId == tenantId);
         modelBuilder.Entity<Payroll>().HasQueryFilter(x => x.TenantId == tenantId);
 
+        modelBuilder.Entity<Currency>().HasKey(x => x.Code);
+        modelBuilder.Entity<ExchangeRate>().HasKey(x => x.Id);
+        modelBuilder.Entity<TaxRule>().HasKey(x => x.Id);
         base.OnModelCreating(modelBuilder);
     }
 

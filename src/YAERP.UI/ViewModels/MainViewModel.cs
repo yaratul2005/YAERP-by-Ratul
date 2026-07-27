@@ -121,6 +121,9 @@ public partial class MainViewModel : ObservableObject
     private void NavigateWarehouseManagement() => Workspace.OpenTab<WarehouseManagementViewModel>();
 
     [RelayCommand]
+    private void NavigateDeepFinancials() => Workspace.OpenTab<DeepFinancialsViewModel>();
+
+    [RelayCommand]
     private async Task ManualSyncNowAsync()
     {
         if (IsManualSyncRunning || _cloudSyncService == null) return;

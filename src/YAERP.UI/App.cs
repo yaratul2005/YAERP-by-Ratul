@@ -82,6 +82,7 @@ public partial class App : System.Windows.Application
                     services.AddTransient<PluginHubViewModel>();
                     services.AddTransient<ManufacturingViewModel>();
                     services.AddTransient<WarehouseManagementViewModel>();
+                    services.AddTransient<DeepFinancialsViewModel>();
                 })
                 .Build();
         }

@@ -1,0 +1,97 @@
+<UserControl x:Class="YAERP.UI.Views.DeepFinancialsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d"
+             d:DesignHeight="800" d:DesignWidth="1200"
+             Background="#F8FAFC">
+
+    <Grid Margin="24">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <DockPanel Grid.Row="0" Margin="0,0,0,24">
+            <StackPanel DockPanel.Dock="Left">
+                <TextBlock Text="Deep Financials &amp; Tax Control" FontSize="24" FontWeight="Bold" Foreground="#0F172A"/>
+                <TextBlock Text="Manage Fixed Assets, Multi-Currency Revaluations, and Regional Tax filings" FontSize="14" Foreground="#64748B"/>
+            </StackPanel>
+
+            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                <Button Content="💱 Run Forex Revaluation" Command="{Binding ExecuteForexRevaluationCommand}" Padding="16,8" Background="#10B981" Foreground="White" FontWeight="Bold" BorderThickness="0" Margin="0,0,12,0"/>
+                <Button Content="📉 Post Depreciations" Command="{Binding RunDepreciationPostingCommand}" Padding="16,8" Background="#2563EB" Foreground="White" FontWeight="Bold" BorderThickness="0"/>
+            </StackPanel>
+        </DockPanel>
+
+        <TabControl Grid.Row="1" Background="White" BorderBrush="#E2E8F0" BorderThickness="1">
+
+            <!-- Fixed Assets & Depreciation -->
+            <TabItem Header="🚜 Fixed Asset Register">
+                <Grid Margin="16">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <DataGrid Grid.Row="0" ItemsSource="{Binding AssetRegister}" AutoGenerateColumns="False" CanUserAddRows="False"
+                              GridLinesVisibility="Horizontal" BorderBrush="#E2E8F0" HeadersVisibility="Column" RowHeight="40" Margin="0,0,0,16">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Asset Tag" Binding="{Binding AssetTag}" Width="150" FontWeight="SemiBold"/>
+                            <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="250"/>
+                            <DataGridTextColumn Header="Book Value" Binding="{Binding BookValue, StringFormat=C}" Width="150"/>
+                            <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="120"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+
+                    <DataGrid Grid.Row="1" ItemsSource="{Binding PendingDepreciations}" AutoGenerateColumns="False" CanUserAddRows="False"
+                              GridLinesVisibility="Horizontal" BorderBrush="#E2E8F0" HeadersVisibility="Column" RowHeight="40">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Period" Binding="{Binding Period}" Width="150"/>
+                            <DataGridTextColumn Header="Depreciation Amount" Binding="{Binding Amount, StringFormat=C}" Width="180" Foreground="#DC2626" FontWeight="SemiBold"/>
+                            <DataGridTextColumn Header="Book Value After" Binding="{Binding BookValueAfter, StringFormat=C}" Width="180"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+            </TabItem>
+
+            <!-- Forex Revaluation -->
+            <TabItem Header="💱 Forex Exposure Monitor">
+                <Grid Margin="16">
+                    <DataGrid ItemsSource="{Binding ForexExposures}" AutoGenerateColumns="False" CanUserAddRows="False"
+                              GridLinesVisibility="Horizontal" BorderBrush="#E2E8F0" HeadersVisibility="Column" RowHeight="40">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Currency" Binding="{Binding Currency}" Width="150" FontWeight="Bold"/>
+                            <DataGridTextColumn Header="Foreign Balance" Binding="{Binding ForeignBalance, StringFormat=N2}" Width="200"/>
+                            <DataGridTextColumn Header="Unrealized Gain / Loss" Binding="{Binding UnrealizedGainLoss, StringFormat=C}" Width="200" FontWeight="Bold"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+            </TabItem>
+
+            <!-- Tax Returns -->
+            <TabItem Header="⚖️ Tax &amp; VAT Filings">
+                <Grid Margin="16">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <DataGrid Grid.Row="0" ItemsSource="{Binding TaxSummaries}" AutoGenerateColumns="False" CanUserAddRows="False"
+                              GridLinesVisibility="Horizontal" BorderBrush="#E2E8F0" HeadersVisibility="Column" RowHeight="40">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Period" Binding="{Binding Period}" Width="150"/>
+                            <DataGridTextColumn Header="Output VAT (Collected)" Binding="{Binding OutputVat, StringFormat=C}" Width="200"/>
+                            <DataGridTextColumn Header="Input VAT (Paid)" Binding="{Binding InputVat, StringFormat=C}" Width="200"/>
+                            <DataGridTextColumn Header="Net Liability" Binding="{Binding NetLiability, StringFormat=C}" Width="200" FontWeight="Bold"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+
+                    <Button Grid.Row="1" Content="📄 Generate Tax Return" Command="{Binding GenerateTaxReturnCommand}" Padding="16,8" Background="#F59E0B" Foreground="White" FontWeight="Bold" BorderThickness="0" HorizontalAlignment="Right" Margin="0,16,0,0"/>
+                </Grid>
+            </TabItem>
+
+        </TabControl>
+    </Grid>
+</UserControl>
