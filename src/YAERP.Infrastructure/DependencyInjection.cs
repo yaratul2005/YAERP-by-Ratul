@@ -86,6 +86,9 @@ public static class DependencyInjection
 
         services.AddScoped<IBomExplosionService, YAERP.Infrastructure.Manufacturing.BomExplosionService>();
         services.AddScoped<IMrpExplosionService, YAERP.Infrastructure.Manufacturing.MrpExplosionService>();
+        services.AddScoped<ISlottingOptimizationService, YAERP.Infrastructure.Warehouse.SlottingOptimizationService>();
+        services.AddScoped<IFefoPickingService, YAERP.Infrastructure.Warehouse.FefoPickingService>();
+        services.AddScoped<IInventoryValuationService, YAERP.Infrastructure.Warehouse.InventoryValuationService>();
 
         return services;
     }

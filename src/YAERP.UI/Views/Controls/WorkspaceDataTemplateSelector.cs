@@ -15,6 +15,7 @@ public class WorkspaceDataTemplateSelector : DataTemplateSelector
     public DataTemplate? ApprovalCenterTemplate { get; set; }
     public DataTemplate? PluginHubTemplate { get; set; }
     public DataTemplate? ManufacturingTemplate { get; set; }
+    public DataTemplate? WarehouseManagementTemplate { get; set; }
 
     public override DataTemplate SelectTemplate(object item, DependencyObject container)
     {
@@ -28,6 +29,7 @@ public class WorkspaceDataTemplateSelector : DataTemplateSelector
             ApprovalCenterViewModel => ApprovalCenterTemplate,
             PluginHubViewModel => PluginHubTemplate,
             ManufacturingViewModel => ManufacturingTemplate,
+            WarehouseManagementViewModel => WarehouseManagementTemplate,
             _ => base.SelectTemplate(item, container)
         } ?? base.SelectTemplate(item, container);
     }

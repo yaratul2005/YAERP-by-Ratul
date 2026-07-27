@@ -5,9 +5,9 @@ using YAERP.Domain.Inventory;
 
 namespace YAERP.Infrastructure.Persistence.Configurations.Inventory;
 
-public class WarehouseConfiguration : IEntityTypeConfiguration<Warehouse>
+public class WarehouseConfiguration : IEntityTypeConfiguration<YAERP.Domain.Inventory.Warehouse>
 {
-    public void Configure(EntityTypeBuilder<Warehouse> builder)
+    public void Configure(EntityTypeBuilder<YAERP.Domain.Inventory.Warehouse> builder)
     {
         builder.ToTable("Warehouses");
 

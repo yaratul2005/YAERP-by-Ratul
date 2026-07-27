@@ -118,6 +118,9 @@ public partial class MainViewModel : ObservableObject
     private void NavigateManufacturing() => Workspace.OpenTab<ManufacturingViewModel>();
 
     [RelayCommand]
+    private void NavigateWarehouseManagement() => Workspace.OpenTab<WarehouseManagementViewModel>();
+
+    [RelayCommand]
     private async Task ManualSyncNowAsync()
     {
         if (IsManualSyncRunning || _cloudSyncService == null) return;

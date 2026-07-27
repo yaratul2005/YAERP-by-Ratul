@@ -9,6 +9,7 @@ using YAERP.Domain.Sales;
 using YAERP.Domain.Finance;
 using YAERP.Domain.HR;
 using YAERP.Domain.Entities.Manufacturing;
+using YAERP.Domain.Entities.Warehouse;
 
 namespace YAERP.Application.Common.Interfaces;
 
@@ -23,7 +24,7 @@ public interface IApplicationDbContext
     DbSet<ApprovalStepLog> ApprovalStepLogs { get; }
 
     DbSet<Product> Products { get; }
-    DbSet<Warehouse> Warehouses { get; }
+    DbSet<YAERP.Domain.Inventory.Warehouse> Warehouses { get; }
     DbSet<ProductCategory> ProductCategories { get; }
     DbSet<StockMovement> StockMovements { get; }
     DbSet<UnitOfMeasure> UnitsOfMeasure { get; }
@@ -45,6 +46,11 @@ public interface IApplicationDbContext
     DbSet<WorkCenter> WorkCenters { get; }
     DbSet<RoutingStep> RoutingSteps { get; }
     DbSet<WorkOrder> WorkOrders { get; }
+    DbSet<WarehouseZone> WarehouseZones { get; }
+    DbSet<WarehouseBin> WarehouseBins { get; }
+    DbSet<InventoryLot> InventoryLots { get; }
+    DbSet<ProductSerialNumber> ProductSerialNumbers { get; }
+    DbSet<InventoryCostLayer> InventoryCostLayers { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken);
     DbSet<TEntity> Set<TEntity>() where TEntity : class;

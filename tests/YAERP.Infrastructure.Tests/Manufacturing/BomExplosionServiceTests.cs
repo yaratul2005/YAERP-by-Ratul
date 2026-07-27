@@ -74,6 +74,11 @@ public class TestBomDbContext : DbContext, IApplicationDbContext
     public DbSet<YAERP.Domain.Finance.Invoice> Invoices => throw new NotImplementedException();
     public DbSet<YAERP.Domain.HR.Employee> Employees => throw new NotImplementedException();
     public DbSet<YAERP.Domain.HR.Payroll> Payrolls => throw new NotImplementedException();
+    public DbSet<YAERP.Domain.Entities.Warehouse.WarehouseZone> WarehouseZones => throw new NotImplementedException();
+    public DbSet<YAERP.Domain.Entities.Warehouse.WarehouseBin> WarehouseBins => throw new NotImplementedException();
+    public DbSet<YAERP.Domain.Entities.Warehouse.InventoryLot> InventoryLots => throw new NotImplementedException();
+    public DbSet<YAERP.Domain.Entities.Warehouse.ProductSerialNumber> ProductSerialNumbers => throw new NotImplementedException();
+    public DbSet<YAERP.Domain.Entities.Warehouse.InventoryCostLayer> InventoryCostLayers => throw new NotImplementedException();
 }
 
 public class BomExplosionServiceTests : IDisposable

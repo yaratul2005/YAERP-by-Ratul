@@ -8,6 +8,7 @@ using YAERP.Domain.Sales;
 using YAERP.Domain.Finance;
 using YAERP.Domain.HR;
 using YAERP.Domain.Entities.Manufacturing;
+using YAERP.Domain.Entities.Warehouse;
 using YAERP.Infrastructure.Persistence.Interceptors;
 
 namespace YAERP.Infrastructure.Persistence;
@@ -38,7 +39,7 @@ public class YAERPDbContext : DbContext, IApplicationDbContext
     public DbSet<ApprovalStepLog> ApprovalStepLogs => Set<ApprovalStepLog>();
 
     public DbSet<Product> Products => Set<Product>();
-    public DbSet<Warehouse> Warehouses => Set<Warehouse>();
+    public DbSet<YAERP.Domain.Inventory.Warehouse> Warehouses => Set<YAERP.Domain.Inventory.Warehouse>();
     public DbSet<ProductCategory> ProductCategories => Set<ProductCategory>();
     public DbSet<StockMovement> StockMovements => Set<StockMovement>();
     public DbSet<UnitOfMeasure> UnitsOfMeasure => Set<UnitOfMeasure>();
@@ -60,6 +61,11 @@ public class YAERPDbContext : DbContext, IApplicationDbContext
     public DbSet<WorkCenter> WorkCenters => Set<WorkCenter>();
     public DbSet<RoutingStep> RoutingSteps => Set<RoutingStep>();
     public DbSet<WorkOrder> WorkOrders => Set<WorkOrder>();
+    public DbSet<WarehouseZone> WarehouseZones => Set<WarehouseZone>();
+    public DbSet<WarehouseBin> WarehouseBins => Set<WarehouseBin>();
+    public DbSet<InventoryLot> InventoryLots => Set<InventoryLot>();
+    public DbSet<ProductSerialNumber> ProductSerialNumbers => Set<ProductSerialNumber>();
+    public DbSet<InventoryCostLayer> InventoryCostLayers => Set<InventoryCostLayer>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -73,7 +79,7 @@ public class YAERPDbContext : DbContext, IApplicationDbContext
         modelBuilder.Entity<AuditLog>().HasQueryFilter(x => x.TenantId == tenantId);
 
         modelBuilder.Entity<Product>().HasQueryFilter(x => x.TenantId == tenantId);
-        modelBuilder.Entity<Warehouse>().HasQueryFilter(x => x.TenantId == tenantId);
+        modelBuilder.Entity<YAERP.Domain.Inventory.Warehouse>().HasQueryFilter(x => x.TenantId == tenantId);
         modelBuilder.Entity<ProductCategory>().HasQueryFilter(x => x.TenantId == tenantId);
         modelBuilder.Entity<StockMovement>().HasQueryFilter(x => x.TenantId == tenantId);
 
