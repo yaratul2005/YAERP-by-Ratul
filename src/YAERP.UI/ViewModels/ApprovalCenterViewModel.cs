@@ -1,4 +1,5 @@
 using System;
+using YAERP.UI.Workspace;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
@@ -11,7 +12,7 @@ using YAERP.Application.Common.Interfaces;
 
 namespace YAERP.UI.ViewModels;
 
-public partial class ApprovalCenterViewModel : ObservableObject
+public partial class ApprovalCenterViewModel : TabViewModelBase
 {
     private readonly IMediator _mediator;
     private readonly IApplicationDbContext _context;
@@ -36,6 +37,9 @@ public partial class ApprovalCenterViewModel : ObservableObject
 
     public ApprovalCenterViewModel(IMediator mediator, IApplicationDbContext context)
     {
+        Title = "Approval Center";
+        IconKey = "🛡️";
+        TabId = "ApprovalCenterViewModel";
         _mediator = mediator;
         _context = context;
 

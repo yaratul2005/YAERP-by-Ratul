@@ -1,4 +1,5 @@
 using System;
+using YAERP.UI.Workspace;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -12,7 +13,7 @@ namespace YAERP.UI.ViewModels;
 
 public record ProductDto(Guid Id, string Name, string SKU, decimal Price, decimal Stock);
 
-public partial class InventoryViewModel : ObservableObject
+public partial class InventoryViewModel : TabViewModelBase
 {
     private readonly IMediator _mediator;
 
@@ -45,6 +46,9 @@ public partial class InventoryViewModel : ObservableObject
 
     public InventoryViewModel(IMediator mediator)
     {
+        Title = "Inventory";
+        IconKey = "📦";
+        TabId = "InventoryViewModel";
         _mediator = mediator;
     }
 

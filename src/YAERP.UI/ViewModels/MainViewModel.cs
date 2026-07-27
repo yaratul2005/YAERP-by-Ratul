@@ -7,12 +7,14 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using YAERP.Application.Common.Interfaces;
 using YAERP.UI.Services;
+using YAERP.UI.Workspace;
 
 namespace YAERP.UI.ViewModels;
 
 public partial class MainViewModel : ObservableObject
 {
     private readonly INavigationService _navigationService;
+    public ITabWorkspaceService Workspace { get; }
     private readonly IModalService _modalService;
     private readonly ICloudSyncService? _cloudSyncService;
     private readonly IServiceScopeFactory? _scopeFactory;
@@ -30,15 +32,20 @@ public partial class MainViewModel : ObservableObject
     private bool _isManualSyncRunning;
 
     [ObservableProperty]
+    private bool _isCommandPaletteOpen;
+
+    [ObservableProperty]
     private string _syncStatusBadgeText = "● Cloud Online";
 
     public MainViewModel(
         INavigationService navigationService,
+        ITabWorkspaceService workspace,
         IModalService modalService,
         ICloudSyncService? cloudSyncService = null,
         IServiceScopeFactory? scopeFactory = null)
     {
         _navigationService = navigationService;
+        Workspace = workspace;
         _modalService = modalService;
         _cloudSyncService = cloudSyncService;
         _scopeFactory = scopeFactory;
@@ -65,7 +72,7 @@ public partial class MainViewModel : ObservableObject
         }
 
         // Set default view on startup
-        _navigationService.NavigateTo<DashboardViewModel>();
+        Workspace.OpenTab<DashboardViewModel>();
 
         // Initialize background sync status polling timer
         InitializeSyncTimer();
@@ -78,28 +85,37 @@ public partial class MainViewModel : ObservableObject
     public ObservableObject? CurrentModalContent => _modalService.CurrentModalContent;
 
     [RelayCommand]
+    private void ToggleCommandPalette()
+    {
+        IsCommandPaletteOpen = !IsCommandPaletteOpen;
+    }
+
+    [RelayCommand]
     private void CloseModal() => _modalService.CloseModal();
 
     [RelayCommand]
-    private void NavigateDashboard() => _navigationService.NavigateTo<DashboardViewModel>();
+    private void NavigateDashboard() => Workspace.OpenTab<DashboardViewModel>();
 
     [RelayCommand]
-    private void NavigateInventory() => _navigationService.NavigateTo<InventoryViewModel>();
+    private void NavigateInventory() => Workspace.OpenTab<InventoryViewModel>();
 
     [RelayCommand]
-    private void NavigateSales() => _navigationService.NavigateTo<SalesViewModel>();
+    private void NavigateSales() => Workspace.OpenTab<SalesViewModel>();
 
     [RelayCommand]
-    private void NavigateFinance() => _navigationService.NavigateTo<FinanceViewModel>();
+    private void NavigateFinance() => Workspace.OpenTab<FinanceViewModel>();
 
     [RelayCommand]
-    private void NavigatePos() => _navigationService.NavigateTo<PosViewModel>();
+    private void NavigatePos() => Workspace.OpenTab<PosViewModel>();
 
     [RelayCommand]
-    private void NavigateApprovalCenter() => _navigationService.NavigateTo<ApprovalCenterViewModel>();
+    private void NavigateApprovalCenter() => Workspace.OpenTab<ApprovalCenterViewModel>();
 
     [RelayCommand]
-    private void NavigatePluginHub() => _navigationService.NavigateTo<PluginHubViewModel>();
+    private void NavigatePluginHub() => Workspace.OpenTab<PluginHubViewModel>();
+
+    [RelayCommand]
+    private void NavigateManufacturing() => Workspace.OpenTab<ManufacturingViewModel>();
 
     [RelayCommand]
     private async Task ManualSyncNowAsync()

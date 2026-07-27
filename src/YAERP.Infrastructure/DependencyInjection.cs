@@ -84,6 +84,9 @@ public static class DependencyInjection
         services.AddScoped<ICloudSyncService, CloudSyncService>();
         services.AddHostedService<CloudSyncBackgroundWorker>();
 
+        services.AddScoped<IBomExplosionService, YAERP.Infrastructure.Manufacturing.BomExplosionService>();
+        services.AddScoped<IMrpExplosionService, YAERP.Infrastructure.Manufacturing.MrpExplosionService>();
+
         return services;
     }
 }

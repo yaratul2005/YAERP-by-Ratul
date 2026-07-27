@@ -1,4 +1,5 @@
 using System;
+using YAERP.UI.Workspace;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -22,7 +23,7 @@ public record CartItemDto(
     public decimal LineTotal => Math.Round(Quantity * UnitPrice, 2);
 }
 
-public partial class PosViewModel : ObservableObject
+public partial class PosViewModel : TabViewModelBase
 {
     private readonly IMediator _mediator;
     private readonly IReceiptPrinterService _receiptPrinterService;
@@ -84,6 +85,9 @@ public partial class PosViewModel : ObservableObject
         IReceiptPrinterService receiptPrinterService,
         BarcodeScannerListener barcodeListener)
     {
+        Title = "POS Terminal";
+        IconKey = "🖥️";
+        TabId = "PosViewModel";
         _mediator = mediator;
         _receiptPrinterService = receiptPrinterService;
         _barcodeListener = barcodeListener;

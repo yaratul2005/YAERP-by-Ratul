@@ -1,0 +1,107 @@
+<UserControl x:Class="YAERP.UI.Views.ManufacturingView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:controls="clr-namespace:YAERP.UI.Views.Controls"
+             mc:Ignorable="d"
+             d:DesignHeight="800" d:DesignWidth="1200"
+             Background="#F8FAFC">
+
+    <Grid Margin="24">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <DockPanel Grid.Row="0" Margin="0,0,0,24">
+            <StackPanel DockPanel.Dock="Left">
+                <TextBlock Text="Manufacturing &amp; MRP Control" FontSize="24" FontWeight="Bold" Foreground="#0F172A"/>
+                <TextBlock Text="Manage bills of materials, capacity scheduling, and demand explosions" FontSize="14" Foreground="#64748B"/>
+            </StackPanel>
+
+            <Button DockPanel.Dock="Right" HorizontalAlignment="Right" VerticalAlignment="Center"
+                    Content="⚡ Run MRP Explosion" Command="{Binding RunMrpExplosionCommand}"
+                    Padding="16,8" Background="#2563EB" Foreground="White" FontWeight="Bold" BorderThickness="0"  Cursor="Hand"/>
+        </DockPanel>
+
+        <TabControl Grid.Row="1" Background="White" BorderBrush="#E2E8F0" BorderThickness="1">
+
+            <TabItem Header="🌲 BOM Explorer">
+                <Grid Margin="16">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="300"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Border Grid.Column="0" BorderBrush="#E2E8F0" BorderThickness="0,0,1,0" Margin="0,0,16,0">
+                        <ListBox ItemsSource="{Binding ActiveBoms}" BorderThickness="0">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel Margin="0,8">
+                                        <TextBlock Text="{Binding AssemblyName}" FontWeight="SemiBold"/>
+                                        <TextBlock Text="{Binding RevisionCode}" FontSize="12" Foreground="#64748B"/>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </Border>
+
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center">
+                        <TextBlock Text="Select an assembly to view its Multi-Level BOM tree." Foreground="#94A3B8" FontSize="14"/>
+                    </StackPanel>
+                </Grid>
+            </TabItem>
+
+            <TabItem Header="🏭 Work Center Schedule">
+                <Grid Margin="16">
+                    <DataGrid ItemsSource="{Binding ActiveWorkOrders}" AutoGenerateColumns="False" CanUserAddRows="False"
+                              GridLinesVisibility="Horizontal" BorderBrush="#E2E8F0" HeadersVisibility="Column" RowHeight="40">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Work Order" Binding="{Binding WorkOrderNumber}" Width="150"/>
+                            <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="120"/>
+                            <DataGridTextColumn Header="Target Qty" Binding="{Binding TargetQuantity}" Width="100"/>
+                            <DataGridTextColumn Header="Completed Qty" Binding="{Binding CompletedQuantity}" Width="120"/>
+                            <DataGridTemplateColumn Header="Actions" Width="*">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal">
+                                            <Button Content="Release" Command="{Binding DataContext.ReleaseWorkOrderCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}" CommandParameter="{Binding}" Margin="0,0,8,0" Padding="8,4"/>
+                                            <Button Content="Record Output" Command="{Binding DataContext.RecordProductionOutputCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}" CommandParameter="{Binding}" Padding="8,4"/>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+            </TabItem>
+
+            <TabItem Header="📈 MRP Demand Matrix">
+                <Grid Margin="16">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <DataGrid Grid.Row="0" ItemsSource="{Binding MrpSchedule}" AutoGenerateColumns="False" CanUserAddRows="False"
+                              VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.VirtualizationMode="Recycling"
+                              GridLinesVisibility="Horizontal" BorderBrush="#E2E8F0" HeadersVisibility="Column" RowHeight="40">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Product" Binding="{Binding ProductName}" Width="200"/>
+                            <DataGridTextColumn Header="Gross Req." Binding="{Binding GrossRequirement}" Width="100"/>
+                            <DataGridTextColumn Header="On Hand" Binding="{Binding OnHand}" Width="100"/>
+                            <DataGridTextColumn Header="Net Req." Binding="{Binding NetRequirement}" Width="100" FontWeight="Bold"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+
+                    <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,16,0,0">
+                        <Button Content="[Release Purchase Orders]" Padding="12,6" Background="#F59E0B" Foreground="White" BorderThickness="0" Margin="0,0,12,0"/>
+                        <Button Content="[Release Work Orders]" Padding="12,6" Background="#10B981" Foreground="White" BorderThickness="0"/>
+                    </StackPanel>
+                </Grid>
+            </TabItem>
+
+        </TabControl>
+    </Grid>
+</UserControl>

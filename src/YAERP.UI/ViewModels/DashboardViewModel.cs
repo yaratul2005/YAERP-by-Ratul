@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using YAERP.UI.Workspace;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MediatR;
@@ -6,7 +7,7 @@ using YAERP.UI.Services;
 
 namespace YAERP.UI.ViewModels;
 
-public partial class DashboardViewModel : ObservableObject
+public partial class DashboardViewModel : TabViewModelBase
 {
     private readonly IMediator _mediator;
     private readonly INavigationService? _navigationService;
@@ -34,6 +35,9 @@ public partial class DashboardViewModel : ObservableObject
 
     public DashboardViewModel(IMediator mediator, INavigationService? navigationService = null)
     {
+        Title = "Dashboard";
+        IconKey = "📊";
+        TabId = "DashboardViewModel";
         _mediator = mediator;
         _navigationService = navigationService;
     }

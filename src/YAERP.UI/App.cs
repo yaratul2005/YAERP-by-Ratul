@@ -80,6 +80,7 @@ public partial class App : System.Windows.Application
                     services.AddTransient<PosViewModel>();
                     services.AddTransient<ApprovalCenterViewModel>();
                     services.AddTransient<PluginHubViewModel>();
+                    services.AddTransient<ManufacturingViewModel>();
                 })
                 .Build();
         }

@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using YAERP.UI.Workspace;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -8,7 +9,7 @@ namespace YAERP.UI.ViewModels;
 
 public record SalesOrderDto(string OrderNumber, string CustomerName, decimal TotalAmount, string Status);
 
-public partial class SalesViewModel : ObservableObject
+public partial class SalesViewModel : TabViewModelBase
 {
     private readonly IMediator _mediator;
 
@@ -17,6 +18,9 @@ public partial class SalesViewModel : ObservableObject
 
     public SalesViewModel(IMediator mediator)
     {
+        Title = "Sales";
+        IconKey = "🛒";
+        TabId = "SalesViewModel";
         _mediator = mediator;
     }
 

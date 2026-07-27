@@ -7,6 +7,7 @@ using YAERP.Domain.Purchasing;
 using YAERP.Domain.Sales;
 using YAERP.Domain.Finance;
 using YAERP.Domain.HR;
+using YAERP.Domain.Entities.Manufacturing;
 using YAERP.Infrastructure.Persistence.Interceptors;
 
 namespace YAERP.Infrastructure.Persistence;
@@ -54,6 +55,11 @@ public class YAERPDbContext : DbContext, IApplicationDbContext
 
     public DbSet<Employee> Employees => Set<Employee>();
     public DbSet<Payroll> Payrolls => Set<Payroll>();
+    public DbSet<BomHeader> BomHeaders => Set<BomHeader>();
+    public DbSet<BomItem> BomItems => Set<BomItem>();
+    public DbSet<WorkCenter> WorkCenters => Set<WorkCenter>();
+    public DbSet<RoutingStep> RoutingSteps => Set<RoutingStep>();
+    public DbSet<WorkOrder> WorkOrders => Set<WorkOrder>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

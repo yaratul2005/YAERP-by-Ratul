@@ -1,0 +1,29 @@
+Here is the detailed summary of the Phase B implementation:
+
+1. **Multi-Level Bill of Materials (BOM) Engine**
+   - Created `BomHeader.cs` and `BomItem.cs` within the Manufacturing domain namespace. They encapsulate Parent SKUs, Child SKUs, yield percents, and scrap factors.
+   - Built `BomExplosionService.cs` (`IBomExplosionService`) implementing deep recursive DAG traversal.
+   - Designed and tested the cycle detection algorithm `EnsureNoCyclesAsync` to prevent infinite loops (detecting paths where Component A requires B which requires A). It throws `InvalidBomCycleException` if cycles exist.
+   - Calculations use the formula: `EffectiveQty = (ParentQty * QuantityPerAssembly / Yield) * (1 + Scrap)`.
+
+2. **Work Centers & Capacity Scheduling**
+   - Designed domain models for the shop floor routing: `WorkCenter.cs` (daily capacity, efficiency), `RoutingStep.cs` (run times, setup times), and `WorkOrder.cs` (for tracking actual production against target quantities).
+
+3. **MRP Demand Explosion Engine**
+   - Developed `MrpExplosionService.cs` (`IMrpExplosionService`) to calculate gross-to-net demand mathematically.
+   - First, it evaluates gross Independent Demand originating from unfulfilled `SalesOrder` records based on specific target delivery dates.
+   - Next, it evaluates Dependent Demand using the BOM Explosion engine across the product structures.
+   - Calculates the net requirement balancing On-Hand stock and Scheduled Receipts from pending POs and Work Orders.
+   - Finally, offsets planned orders based on `LeadTimeDays` and suggests `PlannedPurchaseOrders` or `PlannedWorkOrders`.
+
+4. **Shop Floor Control Execution UI**
+   - Built the `ManufacturingViewModel.cs` combining collections of active BOMs, active Work Orders, and MRP Demand schedules.
+   - Created `ManufacturingView.xaml` containing three tab-pages:
+     - "BOM Explorer" utilizing a list view to inspect recursive assemblies.
+     - "Work Center Schedule" using virtualizing grids for release and routing actions.
+     - "MRP Demand Matrix" rendering the final gross-to-net math using our UI virtualized DataGrid infrastructure.
+
+5. **Build, Test & Verification**
+   - Designed comprehensive tests in `BomExplosionServiceTests` simulating cyclic structures using `TestBomDbContext` mapping to an EF Core InMemory store. Tests prove cycle blocking and verify multi-level scrap/yield math outcomes.
+   - Added minimal test validation for `MrpExplosionServiceTests` instantiation to confirm dependency graph wiring.
+   - Ran `dotnet build` compiling 0 warnings using strict flag `<TreatWarningsAsErrors>true</TreatWarningsAsErrors>`. All domain and infrastructure logic tests are 100% successful.
