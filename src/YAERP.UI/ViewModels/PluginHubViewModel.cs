@@ -1,4 +1,5 @@
 using System;
+using YAERP.UI.Workspace;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
@@ -9,7 +10,7 @@ using YAERP.Application.Common.Plugins;
 
 namespace YAERP.UI.ViewModels;
 
-public partial class PluginHubViewModel : ObservableObject
+public partial class PluginHubViewModel : TabViewModelBase
 {
     private readonly IPluginManager _pluginManager;
 
@@ -24,6 +25,9 @@ public partial class PluginHubViewModel : ObservableObject
 
     public PluginHubViewModel(IPluginManager pluginManager)
     {
+        Title = "Plugin Hub";
+        IconKey = "🧩";
+        TabId = "PluginHubViewModel";
         _pluginManager = pluginManager;
         PluginsFolderPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "plugins");
 

@@ -1,4 +1,5 @@
 using System;
+using YAERP.UI.Workspace;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -14,7 +15,7 @@ public record AccountDto(string AccountNumber, string Name, decimal Balance);
 public record JournalEntryDto(string EntryNumber, string Description, bool IsPosted);
 public record InvoiceListDto(Guid Id, string InvoiceNumber, decimal TotalAmount);
 
-public partial class FinanceViewModel : ObservableObject
+public partial class FinanceViewModel : TabViewModelBase
 {
     private readonly IMediator _mediator;
 
@@ -38,6 +39,9 @@ public partial class FinanceViewModel : ObservableObject
 
     public FinanceViewModel(IMediator mediator)
     {
+        Title = "Finance";
+        IconKey = "💰";
+        TabId = "FinanceViewModel";
         _mediator = mediator;
     }
 

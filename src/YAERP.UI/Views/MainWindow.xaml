@@ -6,11 +6,16 @@
         xmlns:vm="clr-namespace:YAERP.UI.ViewModels"
         xmlns:views="clr-namespace:YAERP.UI.Views"
         xmlns:anim="clr-namespace:YAERP.UI.Animations"
+        xmlns:controls="clr-namespace:YAERP.UI.Views.Controls"
         mc:Ignorable="d"
         Title="YAERP - Enterprise Resource Planning Suite" Height="768" Width="1366"
         WindowStartupLocation="CenterScreen"
         Background="{DynamicResource BackgroundCanvasBrush}">
 
+    <Window.InputBindings>
+        <KeyBinding Gesture="CTRL+K" Command="{Binding ToggleCommandPaletteCommand}"/>
+        <KeyBinding Gesture="F1" Command="{Binding ToggleCommandPaletteCommand}"/>
+    </Window.InputBindings>
     <Window.Resources>
         <DataTemplate DataType="{x:Type vm:DashboardViewModel}">
             <views:DashboardView />
@@ -35,6 +40,45 @@
         </DataTemplate>
         
         <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+
+        <controls:WorkspaceDataTemplateSelector x:Key="WorkspaceDataTemplateSelector">
+            <controls:WorkspaceDataTemplateSelector.DashboardTemplate>
+                <DataTemplate>
+                    <views:DashboardView />
+                </DataTemplate>
+            </controls:WorkspaceDataTemplateSelector.DashboardTemplate>
+            <controls:WorkspaceDataTemplateSelector.InventoryTemplate>
+                <DataTemplate>
+                    <views:InventoryView />
+                </DataTemplate>
+            </controls:WorkspaceDataTemplateSelector.InventoryTemplate>
+            <controls:WorkspaceDataTemplateSelector.SalesTemplate>
+                <DataTemplate>
+                    <views:SalesView />
+                </DataTemplate>
+            </controls:WorkspaceDataTemplateSelector.SalesTemplate>
+            <controls:WorkspaceDataTemplateSelector.FinanceTemplate>
+                <DataTemplate>
+                    <views:FinanceView />
+                </DataTemplate>
+            </controls:WorkspaceDataTemplateSelector.FinanceTemplate>
+            <controls:WorkspaceDataTemplateSelector.PosTemplate>
+                <DataTemplate>
+                    <views:PosView />
+                </DataTemplate>
+            </controls:WorkspaceDataTemplateSelector.PosTemplate>
+            <controls:WorkspaceDataTemplateSelector.ApprovalCenterTemplate>
+                <DataTemplate>
+                    <views:ApprovalCenterView />
+                </DataTemplate>
+            </controls:WorkspaceDataTemplateSelector.ApprovalCenterTemplate>
+            <controls:WorkspaceDataTemplateSelector.PluginHubTemplate>
+                <DataTemplate>
+                    <views:PluginHubView />
+                </DataTemplate>
+            </controls:WorkspaceDataTemplateSelector.PluginHubTemplate>
+        </controls:WorkspaceDataTemplateSelector>
+
     </Window.Resources>
 
     <Grid>
@@ -158,9 +202,30 @@
                 </DockPanel>
             </Border>
 
-            <!-- Active View Area with Smooth Transition Control -->
-            <anim:ViewTransitionControl Grid.Row="1" Content="{Binding CurrentView}" Margin="24"/>
+
+            <!-- Main Workspace Tabs -->
+            <TabControl Grid.Row="1" ItemsSource="{Binding Workspace.OpenTabs}" SelectedItem="{Binding Workspace.ActiveTab}"
+                        Background="Transparent" BorderThickness="0" Margin="24">
+                <TabControl.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal" Margin="4,2">
+                            <TextBlock Text="{Binding IconKey}" Margin="0,0,8,0"/>
+                            <TextBlock Text="{Binding Title}" FontWeight="SemiBold"/>
+                            <TextBlock Text="*" Visibility="{Binding IsDirty, Converter={StaticResource BoolToVis}}" Foreground="#F59E0B" FontWeight="Bold" Margin="4,0,0,0"/>
+                            <Button Content="✕" Command="{Binding CloseTabCommand}" Background="Transparent" BorderThickness="0" Margin="8,0,0,0" Foreground="#94A3B8" Cursor="Hand" ToolTip="Close Tab"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </TabControl.ItemTemplate>
+                <TabControl.ContentTemplateSelector>
+                    <StaticResource ResourceKey="WorkspaceDataTemplateSelector"/>
+                </TabControl.ContentTemplateSelector>
+            </TabControl>
+
         </Grid>
+
+
+        <!-- Command Palette Overlay -->
+        <controls:CommandPaletteOverlay Grid.ColumnSpan="2" IsVisible="{Binding IsCommandPaletteOpen, Mode=TwoWay}" Panel.ZIndex="100"/>
 
         <!-- Modal Dialog Overlay Backdrop -->
         <Grid Grid.ColumnSpan="2" Visibility="{Binding IsModalOpen, Converter={StaticResource BoolToVis}}" Background="#800F172A">
