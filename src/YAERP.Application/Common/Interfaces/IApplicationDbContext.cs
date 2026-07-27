@@ -8,6 +8,8 @@ using YAERP.Domain.Purchasing;
 using YAERP.Domain.Sales;
 using YAERP.Domain.Finance;
 using YAERP.Domain.HR;
+using YAERP.Domain.Entities.Hcm;
+using YAERP.Domain.Entities.Hcm;
 using YAERP.Domain.Entities.Financials;
 using YAERP.Domain.Entities.Manufacturing;
 using YAERP.Domain.Entities.Warehouse;
@@ -40,8 +42,9 @@ public interface IApplicationDbContext
     DbSet<JournalEntry> JournalEntries { get; }
     DbSet<Invoice> Invoices { get; }
 
-    DbSet<Employee> Employees { get; }
-    DbSet<Payroll> Payrolls { get; }
+    DbSet<YAERP.Domain.Entities.Hcm.Employee> Employees { get; }
+    DbSet<AttendanceRecord> AttendanceRecords { get; }
+
     DbSet<BomHeader> BomHeaders { get; }
     DbSet<BomItem> BomItems { get; }
     DbSet<WorkCenter> WorkCenters { get; }

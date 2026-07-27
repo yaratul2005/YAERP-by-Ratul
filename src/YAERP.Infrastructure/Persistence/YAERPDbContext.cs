@@ -6,7 +6,9 @@ using YAERP.Domain.Inventory;
 using YAERP.Domain.Purchasing;
 using YAERP.Domain.Sales;
 using YAERP.Domain.Finance;
-using YAERP.Domain.HR;
+
+using YAERP.Domain.Entities.Hcm;
+using YAERP.Domain.Entities.Hcm;
 using YAERP.Domain.Entities.Financials;
 using YAERP.Domain.Entities.Manufacturing;
 using YAERP.Domain.Entities.Warehouse;
@@ -55,8 +57,9 @@ public class YAERPDbContext : DbContext, IApplicationDbContext
     public DbSet<JournalEntry> JournalEntries => Set<JournalEntry>();
     public DbSet<Invoice> Invoices => Set<Invoice>();
 
-    public DbSet<Employee> Employees => Set<Employee>();
-    public DbSet<Payroll> Payrolls => Set<Payroll>();
+    public DbSet<YAERP.Domain.Entities.Hcm.Employee> Employees => Set<YAERP.Domain.Entities.Hcm.Employee>();
+    public DbSet<AttendanceRecord> AttendanceRecords => Set<AttendanceRecord>();
+
     public DbSet<BomHeader> BomHeaders => Set<BomHeader>();
     public DbSet<BomItem> BomItems => Set<BomItem>();
     public DbSet<WorkCenter> WorkCenters => Set<WorkCenter>();
@@ -99,8 +102,8 @@ public class YAERPDbContext : DbContext, IApplicationDbContext
         modelBuilder.Entity<JournalEntry>().HasQueryFilter(x => x.TenantId == tenantId);
         modelBuilder.Entity<Invoice>().HasQueryFilter(x => x.TenantId == tenantId);
 
-        modelBuilder.Entity<Employee>().HasQueryFilter(x => x.TenantId == tenantId);
-        modelBuilder.Entity<Payroll>().HasQueryFilter(x => x.TenantId == tenantId);
+
+
 
         modelBuilder.Entity<Currency>().HasKey(x => x.Code);
         modelBuilder.Entity<ExchangeRate>().HasKey(x => x.Id);
