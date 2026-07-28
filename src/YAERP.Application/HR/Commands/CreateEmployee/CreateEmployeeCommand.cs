@@ -9,4 +9,8 @@ public record CreateEmployeeCommand(
     string LastName,
     string Email,
     string Department,
-    decimal BaseSalary) : ICommand<Guid>;
+    decimal BaseSalary,
+    string JobTitle = "Staff Member",
+    DateTime DateOfBirth = default,
+    DateTime HireDate = default,
+    string PayFrequency = "Monthly") : ICommand<Guid>;

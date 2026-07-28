@@ -19,7 +19,7 @@ public class TrieSearchEngine<T>
         if (string.IsNullOrWhiteSpace(key)) return;
 
         var node = _root;
-        foreach (var c in key)
+        foreach (var c in key.ToLowerInvariant())
         {
             if (!node.Children.TryGetValue(c, out var child))
             {
@@ -36,7 +36,7 @@ public class TrieSearchEngine<T>
         if (string.IsNullOrWhiteSpace(key)) return;
 
         var node = _root;
-        foreach (var c in key)
+        foreach (var c in key.ToLowerInvariant())
         {
             if (!node.Children.TryGetValue(c, out node))
             {
@@ -57,7 +57,7 @@ public class TrieSearchEngine<T>
         if (string.IsNullOrWhiteSpace(prefix)) return Array.Empty<T>();
 
         var node = _root;
-        foreach (var c in prefix)
+        foreach (var c in prefix.ToLowerInvariant())
         {
             if (!node.Children.TryGetValue(c, out node))
             {

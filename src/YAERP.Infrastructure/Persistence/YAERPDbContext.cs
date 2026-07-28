@@ -6,7 +6,11 @@ using YAERP.Domain.Inventory;
 using YAERP.Domain.Purchasing;
 using YAERP.Domain.Sales;
 using YAERP.Domain.Finance;
-using YAERP.Domain.HR;
+
+using YAERP.Domain.Entities.Hcm;
+using YAERP.Domain.Entities.Financials;
+using YAERP.Domain.Entities.Manufacturing;
+using YAERP.Domain.Entities.Warehouse;
 using YAERP.Infrastructure.Persistence.Interceptors;
 
 namespace YAERP.Infrastructure.Persistence;
@@ -37,7 +41,7 @@ public class YAERPDbContext : DbContext, IApplicationDbContext
     public DbSet<ApprovalStepLog> ApprovalStepLogs => Set<ApprovalStepLog>();
 
     public DbSet<Product> Products => Set<Product>();
-    public DbSet<Warehouse> Warehouses => Set<Warehouse>();
+    public DbSet<YAERP.Domain.Inventory.Warehouse> Warehouses => Set<YAERP.Domain.Inventory.Warehouse>();
     public DbSet<ProductCategory> ProductCategories => Set<ProductCategory>();
     public DbSet<StockMovement> StockMovements => Set<StockMovement>();
     public DbSet<UnitOfMeasure> UnitsOfMeasure => Set<UnitOfMeasure>();
@@ -52,8 +56,24 @@ public class YAERPDbContext : DbContext, IApplicationDbContext
     public DbSet<JournalEntry> JournalEntries => Set<JournalEntry>();
     public DbSet<Invoice> Invoices => Set<Invoice>();
 
-    public DbSet<Employee> Employees => Set<Employee>();
-    public DbSet<Payroll> Payrolls => Set<Payroll>();
+    public DbSet<YAERP.Domain.Entities.Hcm.Employee> Employees => Set<YAERP.Domain.Entities.Hcm.Employee>();
+    public DbSet<AttendanceRecord> AttendanceRecords => Set<AttendanceRecord>();
+
+    public DbSet<BomHeader> BomHeaders => Set<BomHeader>();
+    public DbSet<BomItem> BomItems => Set<BomItem>();
+    public DbSet<WorkCenter> WorkCenters => Set<WorkCenter>();
+    public DbSet<RoutingStep> RoutingSteps => Set<RoutingStep>();
+    public DbSet<WorkOrder> WorkOrders => Set<WorkOrder>();
+    public DbSet<WarehouseZone> WarehouseZones => Set<WarehouseZone>();
+    public DbSet<WarehouseBin> WarehouseBins => Set<WarehouseBin>();
+    public DbSet<InventoryLot> InventoryLots => Set<InventoryLot>();
+    public DbSet<ProductSerialNumber> ProductSerialNumbers => Set<ProductSerialNumber>();
+    public DbSet<InventoryCostLayer> InventoryCostLayers => Set<InventoryCostLayer>();
+    public DbSet<FixedAsset> FixedAssets => Set<FixedAsset>();
+    public DbSet<DepreciationScheduleEntry> DepreciationScheduleEntries => Set<DepreciationScheduleEntry>();
+    public DbSet<Currency> Currencies => Set<Currency>();
+    public DbSet<ExchangeRate> ExchangeRates => Set<ExchangeRate>();
+    public DbSet<TaxRule> TaxRules => Set<TaxRule>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -67,7 +87,7 @@ public class YAERPDbContext : DbContext, IApplicationDbContext
         modelBuilder.Entity<AuditLog>().HasQueryFilter(x => x.TenantId == tenantId);
 
         modelBuilder.Entity<Product>().HasQueryFilter(x => x.TenantId == tenantId);
-        modelBuilder.Entity<Warehouse>().HasQueryFilter(x => x.TenantId == tenantId);
+        modelBuilder.Entity<YAERP.Domain.Inventory.Warehouse>().HasQueryFilter(x => x.TenantId == tenantId);
         modelBuilder.Entity<ProductCategory>().HasQueryFilter(x => x.TenantId == tenantId);
         modelBuilder.Entity<StockMovement>().HasQueryFilter(x => x.TenantId == tenantId);
 
@@ -81,9 +101,12 @@ public class YAERPDbContext : DbContext, IApplicationDbContext
         modelBuilder.Entity<JournalEntry>().HasQueryFilter(x => x.TenantId == tenantId);
         modelBuilder.Entity<Invoice>().HasQueryFilter(x => x.TenantId == tenantId);
 
-        modelBuilder.Entity<Employee>().HasQueryFilter(x => x.TenantId == tenantId);
-        modelBuilder.Entity<Payroll>().HasQueryFilter(x => x.TenantId == tenantId);
 
+
+
+        modelBuilder.Entity<Currency>().HasKey(x => x.Code);
+        modelBuilder.Entity<ExchangeRate>().HasKey(x => x.Id);
+        modelBuilder.Entity<TaxRule>().HasKey(x => x.Id);
         base.OnModelCreating(modelBuilder);
     }
 

@@ -1,0 +1,20 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Publish YAERP (.exe)",
+      "type": "process",
+      "command": "dotnet",
+      "args": [
+        "publish",
+        "${workspaceFolder}/src/YAERP.UI/YAERP.UI.csproj",
+        "-c", "Release",
+        "-r", "win-x64",
+        "--self-contained", "true",
+        "-p:PublishSingleFile=true",
+        "-o", "${workspaceFolder}/dist"
+      ],
+      "problemMatcher": "$msCompile"
+    }
+  ]
+}

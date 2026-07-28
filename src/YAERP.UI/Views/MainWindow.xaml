@@ -38,6 +38,15 @@
         <DataTemplate DataType="{x:Type vm:PluginHubViewModel}">
             <views:PluginHubView />
         </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:ManufacturingViewModel}">
+            <views:ManufacturingView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:WarehouseManagementViewModel}">
+            <views:WarehouseManagementView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:DeepFinancialsViewModel}">
+            <views:DeepFinancialsView />
+        </DataTemplate>
         
         <BooleanToVisibilityConverter x:Key="BoolToVis"/>
 
@@ -77,6 +86,21 @@
                     <views:PluginHubView />
                 </DataTemplate>
             </controls:WorkspaceDataTemplateSelector.PluginHubTemplate>
+            <controls:WorkspaceDataTemplateSelector.ManufacturingTemplate>
+                <DataTemplate>
+                    <views:ManufacturingView />
+                </DataTemplate>
+            </controls:WorkspaceDataTemplateSelector.ManufacturingTemplate>
+            <controls:WorkspaceDataTemplateSelector.WarehouseManagementTemplate>
+                <DataTemplate>
+                    <views:WarehouseManagementView />
+                </DataTemplate>
+            </controls:WorkspaceDataTemplateSelector.WarehouseManagementTemplate>
+            <controls:WorkspaceDataTemplateSelector.DeepFinancialsTemplate>
+                <DataTemplate>
+                    <views:DeepFinancialsView />
+                </DataTemplate>
+            </controls:WorkspaceDataTemplateSelector.DeepFinancialsTemplate>
         </controls:WorkspaceDataTemplateSelector>
 
     </Window.Resources>
@@ -106,11 +130,14 @@
                 <!-- Navigation Links -->
                 <StackPanel DockPanel.Dock="Top">
                     <Button Content="📊  Dashboard" Command="{Binding NavigateDashboardCommand}" Style="{StaticResource SidebarNavButton}"/>
+                    <Button Content="🏢  Warehouse &amp; WMS" Command="{Binding NavigateWarehouseManagementCommand}" Style="{StaticResource SidebarNavButton}"/>
                     <Button Content="📦  Inventory &amp; Stock" Command="{Binding NavigateInventoryCommand}" Style="{StaticResource SidebarNavButton}"/>
                     <Button Content="🛒  Sales &amp; CRM" Command="{Binding NavigateSalesCommand}" Style="{StaticResource SidebarNavButton}"/>
+                    <Button Content="📈  Deep Financials" Command="{Binding NavigateDeepFinancialsCommand}" Style="{StaticResource SidebarNavButton}"/>
                     <Button Content="💰  Finance &amp; Ledger" Command="{Binding NavigateFinanceCommand}" Style="{StaticResource SidebarNavButton}"/>
                     <Button Content="🖥️  POS Terminal" Command="{Binding NavigatePosCommand}" Style="{StaticResource SidebarNavButton}"/>
                     <Button Content="🛡️  Approval Center" Command="{Binding NavigateApprovalCenterCommand}" Style="{StaticResource SidebarNavButton}"/>
+                    <Button Content="🏭  Manufacturing" Command="{Binding NavigateManufacturingCommand}" Style="{StaticResource SidebarNavButton}"/>
                     <Button Content="🧩  Plugin Hub" Command="{Binding NavigatePluginHubCommand}" Style="{StaticResource SidebarNavButton}"/>
                 </StackPanel>
 

@@ -115,6 +115,15 @@ public partial class MainViewModel : ObservableObject
     private void NavigatePluginHub() => Workspace.OpenTab<PluginHubViewModel>();
 
     [RelayCommand]
+    private void NavigateManufacturing() => Workspace.OpenTab<ManufacturingViewModel>();
+
+    [RelayCommand]
+    private void NavigateWarehouseManagement() => Workspace.OpenTab<WarehouseManagementViewModel>();
+
+    [RelayCommand]
+    private void NavigateDeepFinancials() => Workspace.OpenTab<DeepFinancialsViewModel>();
+
+    [RelayCommand]
     private async Task ManualSyncNowAsync()
     {
         if (IsManualSyncRunning || _cloudSyncService == null) return;

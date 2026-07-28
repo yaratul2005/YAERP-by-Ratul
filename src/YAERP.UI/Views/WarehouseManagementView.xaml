@@ -1,0 +1,86 @@
+<UserControl x:Class="YAERP.UI.Views.WarehouseManagementView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d"
+             d:DesignHeight="800" d:DesignWidth="1200"
+             Background="#F8FAFC">
+
+    <Grid Margin="24">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <DockPanel Grid.Row="0" Margin="0,0,0,24">
+            <StackPanel DockPanel.Dock="Left">
+                <TextBlock Text="WMS &amp; Inventory Valuation" FontSize="24" FontWeight="Bold" Foreground="#0F172A"/>
+                <TextBlock Text="Advanced warehouse spatial slotting, lot traceability, and cost layering" FontSize="14" Foreground="#64748B"/>
+            </StackPanel>
+
+            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                <Button Content="🔍 FEFO Route" Command="{Binding GenerateFefoPickListCommand}" Padding="16,8" Background="#10B981" Foreground="White" FontWeight="Bold" BorderThickness="0" Margin="0,0,12,0"/>
+                <Button Content="📊 Valuation Audit" Command="{Binding RunValuationAuditCommand}" Padding="16,8" Background="#2563EB" Foreground="White" FontWeight="Bold" BorderThickness="0"/>
+            </StackPanel>
+        </DockPanel>
+
+        <TabControl Grid.Row="1" Background="White" BorderBrush="#E2E8F0" BorderThickness="1">
+
+            <!-- Spatial Bin Matrix -->
+            <TabItem Header="🏢 Spatial Bin Matrix">
+                <Grid Margin="16">
+                    <DataGrid ItemsSource="{Binding SpatialBins}" AutoGenerateColumns="False" CanUserAddRows="False"
+                              GridLinesVisibility="Horizontal" BorderBrush="#E2E8F0" HeadersVisibility="Column" RowHeight="40">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Bin Code" Binding="{Binding BinCode}" Width="200" FontWeight="SemiBold"/>
+                            <DataGridTextColumn Header="Zone Type" Binding="{Binding ZoneType}" Width="150"/>
+                            <DataGridTextColumn Header="Utilization %" Binding="{Binding UtilizationPercent}" Width="120"/>
+                            <DataGridCheckBoxColumn Header="Cold Storage" Binding="{Binding IsColdStorage}" Width="100"/>
+                            <DataGridCheckBoxColumn Header="Locked/Quarantine" Binding="{Binding IsLocked}" Width="140"/>
+                            <DataGridTemplateColumn Header="Actions" Width="*">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Button Content="Lock / Unlock" Command="{Binding DataContext.LockBinCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}" CommandParameter="{Binding}" Padding="8,4"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+            </TabItem>
+
+            <!-- Lot Expiry & FEFO Dashboard -->
+            <TabItem Header="🏷️ Lot Expiry &amp; FEFO">
+                <Grid Margin="16">
+                    <DataGrid ItemsSource="{Binding ExpiringLots}" AutoGenerateColumns="False" CanUserAddRows="False"
+                              GridLinesVisibility="Horizontal" BorderBrush="#E2E8F0" HeadersVisibility="Column" RowHeight="40">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Lot Number" Binding="{Binding LotNumber}" Width="150" FontWeight="Bold"/>
+                            <DataGridTextColumn Header="Product Name" Binding="{Binding ProductName}" Width="200"/>
+                            <DataGridTextColumn Header="Expiration Date" Binding="{Binding ExpirationDate, StringFormat=d}" Width="150"/>
+                            <DataGridTextColumn Header="Available Qty" Binding="{Binding Quantity}" Width="120"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+            </TabItem>
+
+            <!-- Valuation Ledger -->
+            <TabItem Header="💰 Valuation Ledger">
+                <Grid Margin="16">
+                    <DataGrid ItemsSource="{Binding CostLayers}" AutoGenerateColumns="False" CanUserAddRows="False"
+                              GridLinesVisibility="Horizontal" BorderBrush="#E2E8F0" HeadersVisibility="Column" RowHeight="40">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Product Name" Binding="{Binding ProductName}" Width="200"/>
+                            <DataGridTextColumn Header="Layer Created" Binding="{Binding LayerDate, StringFormat=d}" Width="150"/>
+                            <DataGridTextColumn Header="Unit Cost" Binding="{Binding UnitCost, StringFormat=C}" Width="120"/>
+                            <DataGridTextColumn Header="Remaining Qty" Binding="{Binding RemainingQuantity}" Width="120"/>
+                            <DataGridTextColumn Header="Total Value" Binding="{Binding TotalValue, StringFormat=C}" Width="150" FontWeight="Bold"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+            </TabItem>
+
+        </TabControl>
+    </Grid>
+</UserControl>
