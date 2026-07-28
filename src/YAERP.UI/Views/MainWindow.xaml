@@ -232,7 +232,7 @@
 
 
             <!-- Main Workspace Tabs -->
-            <TabControl Grid.Row="1" ItemsSource="{Binding Workspace.OpenTabs}" SelectedItem="{Binding Workspace.ActiveTab}"
+            <TabControl Grid.Row="2" ItemsSource="{Binding Workspace.OpenTabs}" SelectedItem="{Binding Workspace.ActiveTab}"
                         Background="Transparent" BorderThickness="0" Margin="24">
                 <TabControl.ItemTemplate>
                     <DataTemplate>

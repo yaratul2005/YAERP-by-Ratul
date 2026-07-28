@@ -1,0 +1,31 @@
+### Profile & Roles Management (IAM & Governance) Execution Summary
+
+**1. Domain & Application Security Layer**
+- **Domain Entities (`YAERP.Domain.Entities.Security`)**: Created foundational IAM entities extending `Entity<T>`:
+  - `ApplicationUser`: Robust model including secure fields for `PasswordHash`, `PasswordSalt`, `IsMfaEnabled`, and general profile data. Implemented factory pattern logic (`Create`).
+  - `ApplicationRole` & `Permission`: Handled grouped module hierarchies.
+  - Intersect entities: `UserRole` and `RolePermission`.
+  - `UserSecurityAuditLog`: Read-only entity modeling security operations tracking context like `EventType`, `Severity`, `Details`, and `IpAddress`.
+- **Infrastructure (`YAERP.Infrastructure.Security.IdentityService`)**:
+  - Implemented `IIdentityService`.
+  - Used robust PBKDF2 (`Rfc2898DeriveBytes`) with `SHA-256`, 100k iterations, and 128-bit randomized salts for high-security password hashing (`HashPassword` & `VerifyPassword`).
+  - Created an in-memory `ConcurrentDictionary`-backed cache for permission evaluations bridging sub-millisecond retrieval checks.
+  - Implemented asynchronous hook `LogSecurityEventAsync` to ingest system-level auth actions directly.
+
+**2. User & Roles UI Workspace (`YAERP.UI`)**
+- Created `UserAndRolesViewModel` exposing modular components for tracking state changes.
+- Engineered comprehensive `UserAndRolesView.xaml` workspace:
+  - Header actions for Add User/Role, Refresh, and Export functions.
+  - Sub-Tabs segregating functions:
+    1. **User Directory**: Clean `DataGrid` highlighting roles, departments, active status, and explicit administrative functions like "Reset Pwd" and "Toggle Status".
+    2. **Permission Matrix Editor**: Displaying interactive hierarchical data via `TreeView` binding permissions by explicit Domain/Module codes over selectable roles via `ListBox`.
+    3. **Audit Logs Viewer**: Highlighted `DataGrid` using DataTriggers reflecting severity ("High" displays as crimson tint, "Medium" as amber tint).
+
+**3. Modals & Profile Drawers (`YAERP.UI`)**
+- Developed `UserEditorModal` providing clear input structuring mapped to `UserEditorModalViewModel` for adding/updating staff details dynamically integrating `IDialogService` and `ShowGlobalToastAsync`.
+- Delivered `UserProfileDrawer` configured via `UserProfileDrawerViewModel`, enabling personalized app contexts (dark mode, layout grids, default startup navigation) and direct secure credential rotation (password matching).
+
+**4. Testing & Verification**
+- Created robust XUnit tests inside `tests/YAERP.Infrastructure.Tests` covering cryptography matching logic (success/fail parameters), and evaluated explicit thread-safe concurrent capability logic inside the memory cache.
+- Mapped mocked interactions using `Moq` for dialog calls inside `tests/YAERP.UI.Tests`.
+- Successfully evaluated the solution using `dotnet build -c Release` confirming absolute 0 Warning compliance natively targeting `.NET 10.0`.

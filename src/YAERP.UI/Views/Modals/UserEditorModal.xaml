@@ -1,0 +1,35 @@
+<UserControl x:Class="YAERP.UI.Views.Modals.UserEditorModal"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d"
+             d:DesignHeight="400" d:DesignWidth="400">
+    <StackPanel Margin="16">
+        <TextBlock Text="Username" FontWeight="SemiBold" Margin="0,0,0,4"/>
+        <TextBox Text="{Binding Username}" Margin="0,0,0,16" Padding="8"/>
+
+        <TextBlock Text="Full Name" FontWeight="SemiBold" Margin="0,0,0,4"/>
+        <TextBox Text="{Binding FullName}" Margin="0,0,0,16" Padding="8"/>
+
+        <TextBlock Text="Email" FontWeight="SemiBold" Margin="0,0,0,4"/>
+        <TextBox Text="{Binding Email}" Margin="0,0,0,16" Padding="8"/>
+
+        <TextBlock Text="Department" FontWeight="SemiBold" Margin="0,0,0,4"/>
+        <TextBox Text="{Binding Department}" Margin="0,0,0,16" Padding="8"/>
+
+        <TextBlock Text="Base Role" FontWeight="SemiBold" Margin="0,0,0,4"/>
+        <ComboBox SelectedItem="{Binding SelectedRole}" Margin="0,0,0,16" Padding="8">
+            <ComboBoxItem Content="Admin"/>
+            <ComboBoxItem Content="Manager"/>
+            <ComboBoxItem Content="User"/>
+        </ComboBox>
+
+        <CheckBox IsChecked="{Binding IsMfaEnabled}" Content="Enable Multi-Factor Authentication (MFA)" Margin="0,0,0,24"/>
+
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button Command="{Binding CancelCommand}" Content="Cancel" Style="{DynamicResource GhostButtonStyle}" Margin="0,0,8,0"/>
+            <Button Command="{Binding SaveCommand}" Content="Save User" Style="{DynamicResource PrimaryButtonStyle}"/>
+        </StackPanel>
+    </StackPanel>
+</UserControl>
