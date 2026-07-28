@@ -1,0 +1,76 @@
+name: Build, Test & Release
+
+on:
+  push:
+    branches: [ "main" ]
+    tags:
+      - 'v*.*.*'
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-and-test:
+    name: Build & Test
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: '10.0.x'
+
+    - name: Restore dependencies
+      run: dotnet restore YAERP.slnx
+
+    - name: Build
+      run: dotnet build YAERP.slnx -c Release /p:TreatWarningsAsErrors=true
+
+    - name: Test
+      run: dotnet test YAERP.slnx -c Release --no-build --verbosity normal
+
+  package-and-release:
+    name: Package & Release
+    needs: build-and-test
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: '10.0.x'
+
+    - name: Publish YAERP.UI (Self-Contained)
+      run: dotnet publish src/YAERP.UI/YAERP.UI.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -o ./publish/
+
+    - name: Zip Artifact
+      run: Compress-Archive -Path ./publish/* -DestinationPath YAERP-win-x64.zip
+
+    - name: Generate Version Manifest
+      run: |
+        $version = "${{ github.ref_name }}"
+        $date = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")
+        $json = @"
+        {
+          "Version": "$version",
+          "ReleaseDateUtc": "$date",
+          "DownloadUrl": "https://github.com/${{ github.repository }}/releases/download/$version/YAERP-win-x64.zip",
+          "ReleaseNotes": "Automated release for $version",
+          "IsMandatoryUpdate": false,
+          "MinimumSupportedVersion": "1.0.0"
+        }
+        "@
+        $json | Out-File version.json
+
+    - name: Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: |
+          YAERP-win-x64.zip
+          version.json
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

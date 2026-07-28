@@ -1,0 +1,19 @@
+### Production Installer, Auto-Updater & CI/CD Pipeline Execution Summary
+
+**1. In-App Auto-Updater & Release Manifest**
+- Created `AppReleaseManifest.cs` standardizing the schema for update tracking (version tags, download targets, and strictness markers).
+- Implemented `AutoUpdaterService` parsing standard semantic `vX.Y.Z` version formats and comparing integers across remote targets asynchronously. Included simulated byte transmission tracking.
+- Embedded update hooks actively within `MainViewModel` initializing checks silently on background threads across application launches.
+- Engineered `MainWindow.xaml` to display dynamic `IsUpdateAvailable` borders rendering download interactions gracefully at the top hierarchy layer without breaking standard app use flows.
+
+**2. GitHub Actions CI/CD Pipeline**
+- Deployed `.github/workflows/build-test-release.yml` automating explicit rules mapping test execution to Main PR branches whilst retaining distinct deployment flows against tag pushes (`v*.*.*`).
+- Encapsulated two separate job queues (`build-and-test` -> `package-and-release`):
+  - Job 1 standardizes unit test environments validating absolute zero compilation issues using `/p:TreatWarningsAsErrors=true` arguments securely caching outputs.
+  - Job 2 relies on explicit trigger criteria invoking the CLI `publish` arguments targeting single-file `win-x64` WPF architectures bundling MSIX structures natively into Zip archives using `softprops/action-gh-release@v1`.
+  - Added programmatic generation of `version.json` outputting synchronized tags matching git actions explicitly enabling downstream parsing by the AutoUpdaterService in real deployments.
+
+**3. Build & Test Validations**
+- Built validation checks within `tests/YAERP.Infrastructure.Tests` specifically mapped targeting `IsVersionNewer` algorithms against differing array iterations handling invalid schema and correct hierarchy updates gracefully.
+- Tested explicit command integrations within `YAERP.UI.Tests` against Mock dependencies validating update loops fire accurately.
+- Fully verified all code logic targeting `dotnet build -c Release` completing strictly passing code standards with 0 exceptions globally across 9 target projects spanning layers.

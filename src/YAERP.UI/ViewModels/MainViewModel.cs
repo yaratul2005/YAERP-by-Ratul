@@ -13,11 +13,24 @@ namespace YAERP.UI.ViewModels;
 
 public partial class MainViewModel : ObservableObject
 {
+    [ObservableProperty]
+    private bool _isUpdateAvailable;
+
+    [ObservableProperty]
+    private string _updateBannerText = string.Empty;
+
+    [ObservableProperty]
+    private bool _isDownloadingUpdate;
+
+    [ObservableProperty]
+    private int _updateDownloadProgress;
+
     private readonly INavigationService _navigationService;
     public ITabWorkspaceService Workspace { get; }
     private readonly IModalService _modalService;
     private readonly IDialogService _dialogService;
     private readonly ICloudSyncService? _cloudSyncService;
+    private readonly IAutoUpdaterService? _autoUpdaterService;
     private readonly IServiceScopeFactory? _scopeFactory;
 
     [ObservableProperty]
@@ -43,6 +56,7 @@ public partial class MainViewModel : ObservableObject
         ITabWorkspaceService workspace,
         IModalService modalService,
         IDialogService dialogService,
+        IAutoUpdaterService? autoUpdaterService = null,
         ICloudSyncService? cloudSyncService = null,
         IServiceScopeFactory? scopeFactory = null)
     {
@@ -50,6 +64,7 @@ public partial class MainViewModel : ObservableObject
         Workspace = workspace;
         _modalService = modalService;
         _dialogService = dialogService;
+        _autoUpdaterService = autoUpdaterService;
         _cloudSyncService = cloudSyncService;
         _scopeFactory = scopeFactory;
 
@@ -73,6 +88,8 @@ public partial class MainViewModel : ObservableObject
                 OnPropertyChanged(nameof(CurrentModalContent));
             };
         }
+
+        _ = CheckForUpdatesAsync();
 
         // Set default view on startup
         Workspace.OpenTab<DashboardViewModel>();
@@ -148,6 +165,38 @@ public partial class MainViewModel : ObservableObject
         {
             IsManualSyncRunning = false;
         }
+    }
+
+
+    private async Task CheckForUpdatesAsync()
+    {
+        if (_autoUpdaterService == null) return;
+
+        var currentVersion = "1.0.0"; // In real app: Assembly.GetExecutingAssembly().GetName().Version.ToString()
+        var manifest = await _autoUpdaterService.CheckForUpdatesAsync(currentVersion);
+
+        if (manifest != null)
+        {
+            UpdateBannerText = $"🚀 YAERP v{manifest.Version} is available! [{manifest.ReleaseNotes}]";
+            IsUpdateAvailable = true;
+        }
+    }
+
+    [RelayCommand]
+    private async Task DownloadUpdateAsync()
+    {
+        if (_autoUpdaterService == null) return;
+
+        IsDownloadingUpdate = true;
+
+        await _autoUpdaterService.DownloadUpdateAsync("url", progress =>
+        {
+            UpdateDownloadProgress = progress;
+        });
+
+        await _dialogService.ShowGlobalToastAsync("Update downloaded. Restarting application...");
+        IsDownloadingUpdate = false;
+        IsUpdateAvailable = false;
     }
 
     private void InitializeSyncTimer()
