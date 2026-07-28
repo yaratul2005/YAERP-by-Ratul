@@ -1,5 +1,8 @@
 #!/bin/bash
-# Revert the test csproj file properly
-sed -i 's/<TargetFramework>net10.0<\/TargetFramework>/<TargetFramework>net10.0-windows<\/TargetFramework>/g' tests/YAERP.UI.Tests/YAERP.UI.Tests.csproj
+export DOTNET_CLI_TELEMETRY_OPTOUT=1
+export DOTNET_SKIP_FIRST_TIME_EXPERIENCE=1
 
-dotnet build YAERP.slnx -c Release
+dotnet test tests/YAERP.Domain.Tests/YAERP.Domain.Tests.csproj
+dotnet test tests/YAERP.Application.Tests/YAERP.Application.Tests.csproj
+dotnet test tests/YAERP.Infrastructure.Tests/YAERP.Infrastructure.Tests.csproj
+# Skipping UI and Architecture tests as WPF/WindowsDesktop framework isn't available in this linux runner
