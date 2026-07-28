@@ -1,0 +1,32 @@
+# RAAX ERP GitHub Copilot Custom Instructions & PR Review Prompt Configuration
+
+Successfully implemented the fine-grained AI engineering governance infrastructure for the RAAX ERP project. The following files were created to enforce strict architectural, security, and modular boundaries:
+
+1. **`.github/copilot-instructions.md`**:
+   - Establishes the global foundation: PHP 8.3, Laravel 12, PostgreSQL.
+   - Enforces strict typing (`declare(strict_types=1);`), Clean Architecture/DDD.
+   - Explicitly bans client-side predictive logic, forcing all business state calculations to the server.
+
+2. **`.github/instructions/database.instructions.md`** (`applyTo: "database/migrations/**/*"`):
+   - Mandates Row-Level Security (RLS) on all new tables.
+   - Forces `tenant_isolation_policy` attachment to the `app_user` role.
+   - Bans superuser operations and RLS bypasses.
+
+3. **`.github/instructions/finance.instructions.md`** (`applyTo: "modules/Finance/**/*"`):
+   - Strictly prohibits floating-point arithmetic for monetary values, mandating integer cents.
+   - Requires explicit ISO 4217 currency pairings for transaction payloads.
+   - Enforces the cryptographically chained ledger formula: `H_n = SHA-256(H_{n-1} || Payload_Hash_n)`.
+
+4. **`.github/instructions/modules.instructions.md`** (`applyTo: "modules/**/*"`):
+   - Ensures strict module isolation by banning direct cross-module Eloquent queries and model instantiations.
+   - Enforces standardized JSON validation error structures using `App\Http\Requests\BaseRequest`.
+
+5. **`.github/prompts/review-pr.prompt.md`**:
+   - Registers the `/review-pr` slash command prompt.
+   - Outputs a structured, four-part audit report evaluating:
+     1. 🛡️ RLS & Security Compliance
+     2. 💰 Financial & Cryptographic Ledger Integrity
+     3. 🧩 Modular Boundary Check
+     4. ⚠️ Violations & Required Changes
+
+All files feature correct YAML frontmatter globs targeting specific directories to ensure the AI applies the precise instructions corresponding to the code context being edited.
