@@ -66,9 +66,11 @@ public partial class App : System.Windows.Application
                     // Register Hardware Helpers
                     services.AddSingleton<BarcodeScannerListener>();
 
-                    // Register Navigation & Main Window & Modal Service
+                    // Register Navigation, Workspace, Command Palette, Modal Service & Main Window
                     services.AddSingleton<INavigationService, NavigationService>();
                     services.AddSingleton<IModalService, ModalService>();
+                    services.AddSingleton<ITabWorkspaceService, TabWorkspaceService>();
+                    services.AddSingleton<ICommandPaletteService, CommandPaletteService>();
                     services.AddSingleton<MainWindow>();
 
                     // Register ViewModels
