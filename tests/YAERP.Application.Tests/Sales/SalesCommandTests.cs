@@ -69,6 +69,7 @@ public class SalesCommandTests
         var customerId = Guid.NewGuid();
         var warehouseId = Guid.NewGuid();
         var customer = Customer.Create(tenantContext.CurrentTenantId!, "Acme Test", "TAX1", "acme@test.com", "123", "Addr", 50000m);
+        typeof(YAERP.Domain.Common.Primitives.Entity<YAERP.Domain.Sales.CustomerId>).GetProperty("Id")?.SetValue(customer, new YAERP.Domain.Sales.CustomerId(customerId));
 
         db.Customers.Add(customer);
         await db.SaveChangesAsync();

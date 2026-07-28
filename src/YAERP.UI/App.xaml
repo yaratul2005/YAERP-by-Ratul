@@ -4,6 +4,8 @@
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Resources/Animations.xaml"/>
+                <ResourceDictionary Source="Resources/ButtonStyles.xaml"/>
                 <ResourceDictionary Source="Resources/VectorIcons.xaml"/>
                 <ResourceDictionary Source="Styles/ModernTheme.xaml"/>
             </ResourceDictionary.MergedDictionaries>

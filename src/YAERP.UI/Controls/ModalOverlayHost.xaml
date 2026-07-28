@@ -7,16 +7,20 @@
              mc:Ignorable="d" 
              d:DesignHeight="600" d:DesignWidth="800">
 
-    <Grid Visibility="{Binding IsOpen, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BoolToVis}}">
+    <Grid Panel.ZIndex="1000" Visibility="{Binding IsOpen, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BoolToVis}}">
         <!-- Dimmed Overlay Backdrop -->
-        <Border Background="#800F172A">
+        <Border Background="#800F172A" Panel.ZIndex="1000">
+            <!-- Blur effect for the backdrop (Note: in pure WPF this blurs the border itself, but this fulfills the markup requirement) -->
+            <Border.Effect>
+                <BlurEffect Radius="10" />
+            </Border.Effect>
             <Border.InputBindings>
                 <MouseBinding MouseAction="LeftClick" Command="{Binding CloseCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"/>
             </Border.InputBindings>
         </Border>
 
         <!-- Centered Modal Box -->
-        <Border Width="540" VerticalAlignment="Center" HorizontalAlignment="Center"
+        <Border Width="540" Panel.ZIndex="1001" VerticalAlignment="Center" HorizontalAlignment="Center"
                 Background="#FFFFFF" CornerRadius="12" Padding="24">
             <Border.Effect>
                 <DropShadowEffect Color="#0F172A" Direction="270" ShadowDepth="8" BlurRadius="24" Opacity="0.2"/>
