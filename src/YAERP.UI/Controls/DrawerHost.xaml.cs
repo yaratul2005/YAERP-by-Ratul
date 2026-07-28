@@ -36,6 +36,27 @@ public partial class DrawerHost : UserControl
         set => SetValue(DrawerContentProperty, value);
     }
 
+
+    protected override void OnKeyDown(KeyEventArgs e)
+    {
+        base.OnKeyDown(e);
+        if (e.Key == Key.Escape && IsOpen && CloseCommand?.CanExecute(null) == true)
+        {
+            CloseCommand.Execute(null);
+            e.Handled = true;
+        }
+    }
+
+    protected override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
+    {
+        base.OnPropertyChanged(e);
+        if (e.Property == IsOpenProperty && (bool)e.NewValue)
+        {
+            this.Focus();
+            Keyboard.Focus(this);
+        }
+    }
+
     public ICommand? CloseCommand
     {
         get => (ICommand?)GetValue(CloseCommandProperty);

@@ -7,16 +7,19 @@
              mc:Ignorable="d" 
              d:DesignHeight="600" d:DesignWidth="800">
 
-    <Grid Visibility="{Binding IsOpen, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BoolToVis}}">
+    <Grid Panel.ZIndex="2000" Visibility="{Binding IsOpen, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BoolToVis}}">
         <!-- Dimmed Backdrop -->
-        <Border Background="#800F172A">
+        <Border Background="#800F172A" Panel.ZIndex="2000">
+            <Border.Effect>
+                <BlurEffect Radius="10" />
+            </Border.Effect>
             <Border.InputBindings>
                 <MouseBinding MouseAction="LeftClick" Command="{Binding CloseCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"/>
             </Border.InputBindings>
         </Border>
 
         <!-- Slide-Out Drawer Panel -->
-        <Border Width="480" HorizontalAlignment="Right" Background="#FFFFFF" BorderBrush="#E2E8F0" BorderThickness="1,0,0,0">
+        <Border Width="480" Panel.ZIndex="2001" HorizontalAlignment="Right" Background="#FFFFFF" BorderBrush="#E2E8F0" BorderThickness="1,0,0,0">
             <Border.Effect>
                 <DropShadowEffect Color="#0F172A" Direction="180" ShadowDepth="12" BlurRadius="32" Opacity="0.25"/>
             </Border.Effect>
