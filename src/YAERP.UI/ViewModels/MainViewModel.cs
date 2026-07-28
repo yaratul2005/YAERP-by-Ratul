@@ -16,6 +16,7 @@ public partial class MainViewModel : ObservableObject
     private readonly INavigationService _navigationService;
     public ITabWorkspaceService Workspace { get; }
     private readonly IModalService _modalService;
+    private readonly IDialogService _dialogService;
     private readonly ICloudSyncService? _cloudSyncService;
     private readonly IServiceScopeFactory? _scopeFactory;
 
@@ -41,12 +42,14 @@ public partial class MainViewModel : ObservableObject
         INavigationService navigationService,
         ITabWorkspaceService workspace,
         IModalService modalService,
+        IDialogService dialogService,
         ICloudSyncService? cloudSyncService = null,
         IServiceScopeFactory? scopeFactory = null)
     {
         _navigationService = navigationService;
         Workspace = workspace;
         _modalService = modalService;
+        _dialogService = dialogService;
         _cloudSyncService = cloudSyncService;
         _scopeFactory = scopeFactory;
 
@@ -122,6 +125,12 @@ public partial class MainViewModel : ObservableObject
 
     [RelayCommand]
     private void NavigateDeepFinancials() => Workspace.OpenTab<DeepFinancialsViewModel>();
+
+    [RelayCommand]
+    private async Task OpenConflictResolverAsync()
+    {
+        await _dialogService.ShowDrawerAsync("Conflict Resolver", "ConflictResolverDrawerViewModel");
+    }
 
     [RelayCommand]
     private async Task ManualSyncNowAsync()
