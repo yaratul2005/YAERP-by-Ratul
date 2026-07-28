@@ -1,6 +1,7 @@
 <UserControl x:Class="YAERP.UI.Views.PluginHubView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="clr-namespace:YAERP.UI.Controls"
              Background="{StaticResource BackgroundCanvasBrush}">
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVis"/>
@@ -16,8 +17,19 @@
                         <TextBlock Text="Isolated AssemblyLoadContext runtime module loader &amp; external extension registry" FontSize="13" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,4,0,0"/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
-                        <Button Content="📁  Open Plugins Directory" Command="{Binding OpenPluginsDirectoryCommand}" Padding="10,6" MinHeight="36" Background="#F1F5F9" Foreground="#1E293B" FontWeight="Bold" BorderThickness="0" Cursor="Hand" Margin="0,0,8,0"/>
-                        <Button Content="🔄 Reload Plugins" Command="{Binding RefreshPluginsCommand}" Padding="10,6" MinHeight="36" Background="#2563EB" Foreground="#FFFFFF" FontWeight="Bold" BorderThickness="0" Cursor="Hand"/>
+                        <Button Command="{Binding OpenPluginsDirectoryCommand}" Padding="12,6" MinHeight="36" Background="#F1F5F9" Foreground="#1E293B" FontWeight="Bold" BorderThickness="0" Cursor="Hand" Margin="0,0,8,0">
+                            <StackPanel Orientation="Horizontal">
+                                <controls:SvgIcon Data="{StaticResource Svg.Plugins}" Width="16" Height="16" Foreground="#1E293B" Margin="0,0,6,0"/>
+                                <TextBlock Text="Open Plugins Dir" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+                        
+                        <Button Command="{Binding RefreshPluginsCommand}" Padding="12,6" MinHeight="36" Background="#2563EB" Foreground="#FFFFFF" FontWeight="Bold" BorderThickness="0" Cursor="Hand">
+                            <StackPanel Orientation="Horizontal">
+                                <controls:SvgIcon Data="{StaticResource Svg.Refresh}" Width="16" Height="16" Foreground="#FFFFFF" Margin="0,0,6,0"/>
+                                <TextBlock Text="Reload Plugins" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
                     </StackPanel>
                 </DockPanel>
 
@@ -63,7 +75,7 @@
                                     </DockPanel>
 
                                     <Separator Background="{StaticResource BorderSubtleBrush}" Margin="0,8"/>
-                                    <TextBlock Text="Isolation Level: Collectible AssemblyLoadContext" FontSize="11" Foreground="#64748B" HorizontalAlignment="Center"/>
+                                    <Button Command="{Binding DataContext.OpenPluginLogStreamerDrawerCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}" Content="🔍 Inspect Sandbox Logs" Padding="10,4" Background="#2563EB" Foreground="White" FontWeight="Bold" BorderThickness="0" Cursor="Hand" HorizontalAlignment="Center"/>
                                 </StackPanel>
                             </Border>
                         </DataTemplate>

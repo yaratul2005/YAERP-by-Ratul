@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:controls="clr-namespace:YAERP.UI.Controls"
              mc:Ignorable="d"
              d:DesignHeight="800" d:DesignWidth="1200"
              Background="#F8FAFC">
@@ -13,35 +14,113 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
+        <!-- Top Header & Vector Toolbar -->
         <DockPanel Grid.Row="0" Margin="0,0,0,24">
             <StackPanel DockPanel.Dock="Left">
-                <TextBlock Text="WMS &amp; Inventory Valuation" FontSize="24" FontWeight="Bold" Foreground="#0F172A"/>
-                <TextBlock Text="Advanced warehouse spatial slotting, lot traceability, and cost layering" FontSize="14" Foreground="#64748B"/>
+                <TextBlock Text="WMS &amp; Inventory Spatial Matrix" FontSize="24" FontWeight="Bold" Foreground="#0F172A"/>
+                <TextBlock Text="Real-time bin utilization, slotting optimization, FEFO picking &amp; valuation layering" FontSize="14" Foreground="#64748B"/>
             </StackPanel>
 
             <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
-                <Button Content="🔍 FEFO Route" Command="{Binding GenerateFefoPickListCommand}" Padding="16,8" Background="#10B981" Foreground="White" FontWeight="Bold" BorderThickness="0" Margin="0,0,12,0"/>
-                <Button Content="📊 Valuation Audit" Command="{Binding RunValuationAuditCommand}" Padding="16,8" Background="#2563EB" Foreground="White" FontWeight="Bold" BorderThickness="0"/>
+                <!-- [SVG: Plus] Receive Shipment Button -->
+                <Button Command="{Binding OpenReceivingDockModalCommand}" Padding="14,8" Background="#10B981" Foreground="White" FontWeight="Bold" BorderThickness="0" Margin="0,0,8,0" Cursor="Hand">
+                    <StackPanel Orientation="Horizontal">
+                        <controls:SvgIcon Data="{StaticResource Svg.Plus}" Width="16" Height="16" Foreground="White" Margin="0,0,6,0"/>
+                        <TextBlock Text="Receive Shipment" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Button>
+
+                <!-- [SVG: Transfer] Move Stock Button -->
+                <Button Command="{Binding OpenTransferDrawerCommand}" Padding="14,8" Background="#2563EB" Foreground="White" FontWeight="Bold" BorderThickness="0" Margin="0,0,8,0" Cursor="Hand">
+                    <StackPanel Orientation="Horizontal">
+                        <controls:SvgIcon Data="{StaticResource Svg.Transfer}" Width="16" Height="16" Foreground="White" Margin="0,0,6,0"/>
+                        <TextBlock Text="Move Stock" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Button>
+
+                <!-- [SVG: Lock] Lock Selected Bin Button -->
+                <Button Command="{Binding ToggleBinLockCommand}" CommandParameter="{Binding SelectedBin}" Padding="14,8" Background="#F59E0B" Foreground="White" FontWeight="Bold" BorderThickness="0" Margin="0,0,8,0" Cursor="Hand">
+                    <StackPanel Orientation="Horizontal">
+                        <controls:SvgIcon Data="{StaticResource Svg.Lock}" Width="16" Height="16" Foreground="White" Margin="0,0,6,0"/>
+                        <TextBlock Text="Lock / Unlock Bin" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Button>
+
+                <!-- [SVG: Refresh] Refresh Grid Button -->
+                <Button Command="{Binding RefreshBinsCommand}" Padding="12,8" Background="#F1F5F9" Foreground="#475569" FontWeight="Bold" BorderThickness="0" Cursor="Hand">
+                    <StackPanel Orientation="Horizontal">
+                        <controls:SvgIcon Data="{StaticResource Svg.Refresh}" Width="16" Height="16" Foreground="#475569" Margin="0,0,6,0"/>
+                        <TextBlock Text="Refresh" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Button>
             </StackPanel>
         </DockPanel>
 
+        <!-- Main Tab Control -->
         <TabControl Grid.Row="1" Background="White" BorderBrush="#E2E8F0" BorderThickness="1">
 
-            <!-- Spatial Bin Matrix -->
+            <!-- Spatial Bin Matrix Tab -->
             <TabItem Header="🏢 Spatial Bin Matrix">
                 <Grid Margin="16">
-                    <DataGrid ItemsSource="{Binding SpatialBins}" AutoGenerateColumns="False" CanUserAddRows="False"
-                              GridLinesVisibility="Horizontal" BorderBrush="#E2E8F0" HeadersVisibility="Column" RowHeight="40">
+                    <DataGrid ItemsSource="{Binding SpatialBins}" SelectedItem="{Binding SelectedBin}" AutoGenerateColumns="False" CanUserAddRows="False"
+                               GridLinesVisibility="Horizontal" BorderBrush="#E2E8F0" HeadersVisibility="Column" RowHeight="44">
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="Bin Code" Binding="{Binding BinCode}" Width="200" FontWeight="SemiBold"/>
-                            <DataGridTextColumn Header="Zone Type" Binding="{Binding ZoneType}" Width="150"/>
-                            <DataGridTextColumn Header="Utilization %" Binding="{Binding UtilizationPercent}" Width="120"/>
-                            <DataGridCheckBoxColumn Header="Cold Storage" Binding="{Binding IsColdStorage}" Width="100"/>
-                            <DataGridCheckBoxColumn Header="Locked/Quarantine" Binding="{Binding IsLocked}" Width="140"/>
+                            <DataGridTextColumn Header="Bin Code" Binding="{Binding BinCode}" Width="200" FontWeight="Bold"/>
+                            
+                            <DataGridTemplateColumn Header="Zone Type" Width="140">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Border Background="#F1F5F9" CornerRadius="4" Padding="8,4" HorizontalAlignment="Left">
+                                            <TextBlock Text="{Binding ZoneType}" FontSize="12" FontWeight="SemiBold" Foreground="#334155"/>
+                                        </Border>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+
+                            <DataGridTemplateColumn Header="Volume / Weight Capacity Usage" Width="220">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <StackPanel VerticalAlignment="Center" Margin="0,4">
+                                            <DockPanel Margin="0,0,0,2">
+                                                <TextBlock Text="{Binding UtilizationPercent, StringFormat='{}{0:F1}%'}" FontSize="11" FontWeight="Bold" Foreground="#475569"/>
+                                                <TextBlock Text="Capacity" FontSize="11" Foreground="#94A3B8" HorizontalAlignment="Right"/>
+                                            </DockPanel>
+                                            <ProgressBar Value="{Binding UtilizationPercent}" Minimum="0" Maximum="100" Height="8"/>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+
+                            <DataGridTemplateColumn Header="Storage Flags" Width="160">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                            <Border Visibility="{Binding IsColdStorage, Converter={StaticResource BoolToVis}}" Background="#E0F2FE" CornerRadius="4" Padding="6,2" Margin="0,0,6,0">
+                                                <TextBlock Text="❄ Cold" FontSize="11" FontWeight="Bold" Foreground="#0369A1"/>
+                                            </Border>
+                                            <Border Visibility="{Binding IsLocked, Converter={StaticResource BoolToVis}}" Background="#FEF2F2" CornerRadius="4" Padding="6,2">
+                                                <TextBlock Text="🔒 Locked" FontSize="11" FontWeight="Bold" Foreground="#B91C1C"/>
+                                            </Border>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+
                             <DataGridTemplateColumn Header="Actions" Width="*">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
-                                        <Button Content="Lock / Unlock" Command="{Binding DataContext.LockBinCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}" CommandParameter="{Binding}" Padding="8,4"/>
+                                        <StackPanel Orientation="Horizontal">
+                                            <Button Command="{Binding DataContext.OpenTransferDrawerCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}" CommandParameter="{Binding}" Padding="10,4" Background="#2563EB" Foreground="White" FontWeight="Bold" BorderThickness="0" Margin="0,0,6,0" Cursor="Hand">
+                                                <StackPanel Orientation="Horizontal">
+                                                    <controls:SvgIcon Data="{StaticResource Svg.Transfer}" Width="12" Height="12" Foreground="White" Margin="0,0,4,0"/>
+                                                    <TextBlock Text="Relocate" FontSize="11" VerticalAlignment="Center"/>
+                                                </StackPanel>
+                                            </Button>
+
+                                            <Button Command="{Binding DataContext.ToggleBinLockCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}" CommandParameter="{Binding}" Padding="8,4" Background="#F1F5F9" Foreground="#475569" FontWeight="Bold" BorderThickness="0" Cursor="Hand">
+                                                <controls:SvgIcon Data="{StaticResource Svg.Lock}" Width="12" Height="12" Foreground="#475569"/>
+                                            </Button>
+                                        </StackPanel>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
@@ -53,8 +132,17 @@
             <!-- Lot Expiry & FEFO Dashboard -->
             <TabItem Header="🏷️ Lot Expiry &amp; FEFO">
                 <Grid Margin="16">
+                    <DockPanel DockPanel.Dock="Top" Margin="0,0,0,12">
+                        <Button DockPanel.Dock="Right" Command="{Binding GenerateFefoPickListCommand}" Padding="14,8" Background="#10B981" Foreground="White" FontWeight="Bold" BorderThickness="0" Cursor="Hand">
+                            <StackPanel Orientation="Horizontal">
+                                <controls:SvgIcon Data="{StaticResource Svg.Search}" Width="14" Height="14" Foreground="White" Margin="0,0,6,0"/>
+                                <TextBlock Text="Generate FEFO Pick Route" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+                    </DockPanel>
+
                     <DataGrid ItemsSource="{Binding ExpiringLots}" AutoGenerateColumns="False" CanUserAddRows="False"
-                              GridLinesVisibility="Horizontal" BorderBrush="#E2E8F0" HeadersVisibility="Column" RowHeight="40">
+                               GridLinesVisibility="Horizontal" BorderBrush="#E2E8F0" HeadersVisibility="Column" RowHeight="40">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Lot Number" Binding="{Binding LotNumber}" Width="150" FontWeight="Bold"/>
                             <DataGridTextColumn Header="Product Name" Binding="{Binding ProductName}" Width="200"/>
@@ -68,8 +156,17 @@
             <!-- Valuation Ledger -->
             <TabItem Header="💰 Valuation Ledger">
                 <Grid Margin="16">
+                    <DockPanel DockPanel.Dock="Top" Margin="0,0,0,12">
+                        <Button DockPanel.Dock="Right" Command="{Binding RunValuationAuditCommand}" Padding="14,8" Background="#2563EB" Foreground="White" FontWeight="Bold" BorderThickness="0" Cursor="Hand">
+                            <StackPanel Orientation="Horizontal">
+                                <controls:SvgIcon Data="{StaticResource Svg.Export}" Width="14" Height="14" Foreground="White" Margin="0,0,6,0"/>
+                                <TextBlock Text="Run Cost Valuation Audit" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+                    </DockPanel>
+
                     <DataGrid ItemsSource="{Binding CostLayers}" AutoGenerateColumns="False" CanUserAddRows="False"
-                              GridLinesVisibility="Horizontal" BorderBrush="#E2E8F0" HeadersVisibility="Column" RowHeight="40">
+                               GridLinesVisibility="Horizontal" BorderBrush="#E2E8F0" HeadersVisibility="Column" RowHeight="40">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Product Name" Binding="{Binding ProductName}" Width="200"/>
                             <DataGridTextColumn Header="Layer Created" Binding="{Binding LayerDate, StringFormat=d}" Width="150"/>

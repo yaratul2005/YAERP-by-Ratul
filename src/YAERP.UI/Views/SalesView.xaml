@@ -1,37 +1,187 @@
 <UserControl x:Class="YAERP.UI.Views.SalesView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             Background="{StaticResource BackgroundCanvasBrush}">
-    <Grid Margin="10">
-        <DockPanel>
-            <StackPanel DockPanel.Dock="Top" Margin="0,0,0,20">
-                <DockPanel>
-                    <StackPanel DockPanel.Dock="Left">
-                        <TextBlock Text="Sales Orders &amp; CRM" FontSize="26" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}"/>
-                        <TextBlock Text="Customer orders, quotations, and fulfillment pipeline" FontSize="13" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,4,0,0"/>
-                    </StackPanel>
-                    <Button Content="🛒  Load Sales Orders" Command="{Binding LoadSalesOrdersCommand}" Style="{StaticResource PrimaryButton}" HorizontalAlignment="Right" VerticalAlignment="Center"/>
-                </DockPanel>
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:controls="clr-namespace:YAERP.UI.Controls"
+             mc:Ignorable="d"
+             d:DesignHeight="800" d:DesignWidth="1200"
+             Background="#F8FAFC">
+
+    <Grid Margin="24">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Top Header & Vector Toolbar -->
+        <DockPanel Grid.Row="0" Margin="0,0,0,24">
+            <StackPanel DockPanel.Dock="Left">
+                <TextBlock Text="Sales Orders &amp; CRM Pipeline" FontSize="24" FontWeight="Bold" Foreground="#0F172A"/>
+                <TextBlock Text="Kanban opportunity pipeline, customer 360° credit governance &amp; quote conversion" FontSize="14" Foreground="#64748B"/>
             </StackPanel>
 
-            <Border Style="{StaticResource ModernCard}" Padding="0">
-                <DataGrid ItemsSource="{Binding SalesOrders}" Style="{StaticResource ModernDataGrid}">
-                    <DataGrid.Columns>
-                        <DataGridTextColumn Header="Order Number" Binding="{Binding OrderNumber}" Width="150"/>
-                        <DataGridTextColumn Header="Customer Name" Binding="{Binding CustomerName}" Width="*"/>
-                        <DataGridTextColumn Header="Total Amount ($)" Binding="{Binding TotalAmount, StringFormat='{}{0:C2}'}" Width="160"/>
-                        <DataGridTemplateColumn Header="Fulfillment Status" Width="160">
-                            <DataGridTemplateColumn.CellTemplate>
-                                <DataTemplate>
-                                    <Border Background="#FEF3C7" CornerRadius="12" Padding="10,4" HorizontalAlignment="Left">
-                                        <TextBlock Text="● Pending Draft" Foreground="#B45309" FontSize="11" FontWeight="Bold"/>
-                                    </Border>
-                                </DataTemplate>
-                            </DataGridTemplateColumn.CellTemplate>
-                        </DataGridTemplateColumn>
-                    </DataGrid.Columns>
-                </DataGrid>
-            </Border>
+            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                <!-- [SVG: Plus] New Quotation Button -->
+                <Button Command="{Binding OpenCreateQuotationModalCommand}" Padding="14,8" Background="#059669" Foreground="White" FontWeight="Bold" BorderThickness="0" Margin="0,0,8,0" Cursor="Hand">
+                    <StackPanel Orientation="Horizontal">
+                        <controls:SvgIcon Data="{StaticResource Svg.Plus}" Width="16" Height="16" Foreground="White" Margin="0,0,6,0"/>
+                        <TextBlock Text="Convert Quotation" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Button>
+
+                <!-- [SVG: Plus] New Sales Order Button -->
+                <Button Command="{Binding OpenCreateSalesOrderModalCommand}" Padding="14,8" Background="#2563EB" Foreground="White" FontWeight="Bold" BorderThickness="0" Margin="0,0,8,0" Cursor="Hand">
+                    <StackPanel Orientation="Horizontal">
+                        <controls:SvgIcon Data="{StaticResource Svg.Plus}" Width="16" Height="16" Foreground="White" Margin="0,0,6,0"/>
+                        <TextBlock Text="New Sales Order" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Button>
+
+                <!-- [SVG: Refresh] Refresh Pipeline Button -->
+                <Button Command="{Binding RefreshSalesDataCommand}" Padding="12,8" Background="#F1F5F9" Foreground="#475569" FontWeight="Bold" BorderThickness="0" Cursor="Hand">
+                    <StackPanel Orientation="Horizontal">
+                        <controls:SvgIcon Data="{StaticResource Svg.Refresh}" Width="16" Height="16" Foreground="#475569" Margin="0,0,6,0"/>
+                        <TextBlock Text="Refresh" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Button>
+            </StackPanel>
         </DockPanel>
+
+        <!-- Main Tab Control -->
+        <TabControl Grid.Row="1" Background="White" BorderBrush="#E2E8F0" BorderThickness="1">
+
+            <!-- Interactive Deal Pipeline Kanban Board Tab -->
+            <TabItem Header="📊 Deal Pipeline Kanban">
+                <Grid Margin="16">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="12"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="12"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="12"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Column 1: Qualification -->
+                    <Border Grid.Column="0" Background="#F8FAFC" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="8" Padding="12">
+                        <DockPanel>
+                            <DockPanel DockPanel.Dock="Top" Margin="0,0,0,12">
+                                <TextBlock Text="Qualification" FontSize="14" FontWeight="Bold" Foreground="#334155"/>
+                                <Border Background="#E2E8F0" CornerRadius="10" Padding="8,2" HorizontalAlignment="Right">
+                                    <TextBlock Text="Stage 1" FontSize="10" FontWeight="Bold" Foreground="#475569"/>
+                                </Border>
+                            </DockPanel>
+
+                            <ItemsControl ItemsSource="{Binding KanbanDeals}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Visibility="{Binding Stage, Converter={StaticResource StringToVisConverter}}" Margin="0,0,0,10" Background="White" BorderBrush="#CBD5E1" BorderThickness="1" CornerRadius="6" Padding="10">
+                                            <Border.Effect>
+                                                <DropShadowEffect Color="#0F172A" Direction="270" ShadowDepth="2" BlurRadius="4" Opacity="0.06"/>
+                                            </Border.Effect>
+                                            <StackPanel>
+                                                <TextBlock Text="{Binding DealName}" FontWeight="Bold" Foreground="#0F172A" FontSize="13"/>
+                                                <TextBlock Text="{Binding CustomerName}" Foreground="#64748B" FontSize="11" Margin="0,2,0,6"/>
+                                                <DockPanel>
+                                                    <TextBlock Text="{Binding ExpectedRevenue, StringFormat=C0}" FontWeight="Bold" Foreground="#2563EB" FontSize="13"/>
+                                                    <Button Command="{Binding DataContext.MoveDealStageCommand, RelativeSource={RelativeSource AncestorType=TabControl}}" CommandParameter="{Binding}" Content="Advance ➔" Padding="6,2" Background="#EFF6FF" Foreground="#2563EB" FontWeight="Bold" FontSize="10" BorderThickness="0" HorizontalAlignment="Right" Cursor="Hand"/>
+                                                </DockPanel>
+                                            </StackPanel>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </DockPanel>
+                    </Border>
+
+                    <!-- Column 2: Proposal -->
+                    <Border Grid.Column="2" Background="#F8FAFC" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="8" Padding="12">
+                        <DockPanel>
+                            <DockPanel DockPanel.Dock="Top" Margin="0,0,0,12">
+                                <TextBlock Text="Proposal" FontSize="14" FontWeight="Bold" Foreground="#1E40AF"/>
+                                <Border Background="#DBEAFE" CornerRadius="10" Padding="8,2" HorizontalAlignment="Right">
+                                    <TextBlock Text="Stage 2" FontSize="10" FontWeight="Bold" Foreground="#1E40AF"/>
+                                </Border>
+                            </DockPanel>
+                            <TextBlock Text="Active quotes &amp; proposals" FontSize="12" Foreground="#94A3B8"/>
+                        </DockPanel>
+                    </Border>
+
+                    <!-- Column 3: Negotiation -->
+                    <Border Grid.Column="4" Background="#F8FAFC" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="8" Padding="12">
+                        <DockPanel>
+                            <DockPanel DockPanel.Dock="Top" Margin="0,0,0,12">
+                                <TextBlock Text="Negotiation" FontSize="14" FontWeight="Bold" Foreground="#D97706"/>
+                                <Border Background="#FEF3C7" CornerRadius="10" Padding="8,2" HorizontalAlignment="Right">
+                                    <TextBlock Text="Stage 3" FontSize="10" FontWeight="Bold" Foreground="#B45309"/>
+                                </Border>
+                            </DockPanel>
+                            <TextBlock Text="Final terms review" FontSize="12" Foreground="#94A3B8"/>
+                        </DockPanel>
+                    </Border>
+
+                    <!-- Column 4: Closed Won -->
+                    <Border Grid.Column="6" Background="#F8FAFC" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="8" Padding="12">
+                        <DockPanel>
+                            <DockPanel DockPanel.Dock="Top" Margin="0,0,0,12">
+                                <TextBlock Text="Closed Won" FontSize="14" FontWeight="Bold" Foreground="#059669"/>
+                                <Border Background="#D1FAE5" CornerRadius="10" Padding="8,2" HorizontalAlignment="Right">
+                                    <TextBlock Text="Stage 4" FontSize="10" FontWeight="Bold" Foreground="#047857"/>
+                                </Border>
+                            </DockPanel>
+                            <TextBlock Text="Ready for fulfillment" FontSize="12" Foreground="#94A3B8"/>
+                        </DockPanel>
+                    </Border>
+                </Grid>
+            </TabItem>
+
+            <!-- Sales Orders Master DataGrid Tab -->
+            <TabItem Header="🧾 Sales Orders Ledger">
+                <Grid Margin="16">
+                    <DataGrid ItemsSource="{Binding SalesOrders}" AutoGenerateColumns="False" CanUserAddRows="False"
+                               GridLinesVisibility="Horizontal" BorderBrush="#E2E8F0" HeadersVisibility="Column" RowHeight="42">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Order #" Binding="{Binding OrderNumber}" Width="150" FontWeight="Bold"/>
+                            <DataGridTextColumn Header="Customer Name" Binding="{Binding CustomerName}" Width="250"/>
+                            <DataGridTextColumn Header="Total Amount ($)" Binding="{Binding TotalAmount, StringFormat=C2}" Width="160" FontWeight="Bold"/>
+                            <DataGridTemplateColumn Header="Fulfillment Status" Width="*">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Border Background="#D1FAE5" CornerRadius="12" Padding="10,4" HorizontalAlignment="Left">
+                                            <TextBlock Text="{Binding Status}" Foreground="#065F46" FontSize="11" FontWeight="Bold"/>
+                                        </Border>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+            </TabItem>
+
+            <!-- Customer Master 360 Accounts Tab -->
+            <TabItem Header="👤 Customer 360 Accounts">
+                <Grid Margin="16">
+                    <DataGrid ItemsSource="{Binding Customers}" AutoGenerateColumns="False" CanUserAddRows="False"
+                               GridLinesVisibility="Horizontal" BorderBrush="#E2E8F0" HeadersVisibility="Column" RowHeight="42">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Customer Name" Binding="{Binding Name}" Width="220" FontWeight="Bold"/>
+                            <DataGridTextColumn Header="Email" Binding="{Binding Email}" Width="220"/>
+                            <DataGridTextColumn Header="Credit Limit" Binding="{Binding CreditLimit, StringFormat=C0}" Width="140"/>
+                            <DataGridTextColumn Header="Outstanding AR" Binding="{Binding OutstandingAr, StringFormat=C0}" Width="140" FontWeight="Bold"/>
+                            <DataGridTemplateColumn Header="360° Profile" Width="*">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Button Command="{Binding DataContext.OpenCustomer360ModalCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}" CommandParameter="{Binding}" Content="🔍 Open 360° Profile" Padding="10,4" Background="#2563EB" Foreground="White" FontWeight="Bold" BorderThickness="0" Cursor="Hand"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+            </TabItem>
+
+        </TabControl>
     </Grid>
 </UserControl>

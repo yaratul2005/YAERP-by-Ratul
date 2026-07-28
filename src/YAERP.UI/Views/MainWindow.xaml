@@ -7,6 +7,7 @@
         xmlns:views="clr-namespace:YAERP.UI.Views"
         xmlns:anim="clr-namespace:YAERP.UI.Animations"
         xmlns:controls="clr-namespace:YAERP.UI.Views.Controls"
+        xmlns:uiControls="clr-namespace:YAERP.UI.Controls"
         mc:Ignorable="d"
         Title="YAERP - Enterprise Resource Planning Suite" Height="768" Width="1366"
         WindowStartupLocation="CenterScreen"
@@ -251,11 +252,25 @@
         </Grid>
 
 
+        <!-- Contextual Active Tab Slide-Out Drawer Host -->
+        <uiControls:DrawerHost Grid.ColumnSpan="2" Panel.ZIndex="90"
+                               IsOpen="{Binding Workspace.ActiveTab.IsDrawerOpen}"
+                               Title="{Binding Workspace.ActiveTab.DrawerTitle}"
+                               DrawerContent="{Binding Workspace.ActiveTab.DrawerContent}"
+                               CloseCommand="{Binding Workspace.ActiveTab.CloseDrawerCommand}"/>
+
+        <!-- Contextual Active Tab Modal Overlay Host -->
+        <uiControls:ModalOverlayHost Grid.ColumnSpan="2" Panel.ZIndex="95"
+                                     IsOpen="{Binding Workspace.ActiveTab.IsModalOpen}"
+                                     Title="{Binding Workspace.ActiveTab.ModalTitle}"
+                                     ModalContent="{Binding Workspace.ActiveTab.ModalContent}"
+                                     CloseCommand="{Binding Workspace.ActiveTab.CloseModalCommand}"/>
+
         <!-- Command Palette Overlay -->
         <controls:CommandPaletteOverlay Grid.ColumnSpan="2" IsVisible="{Binding IsCommandPaletteOpen, Mode=TwoWay}" Panel.ZIndex="100"/>
 
-        <!-- Modal Dialog Overlay Backdrop -->
-        <Grid Grid.ColumnSpan="2" Visibility="{Binding IsModalOpen, Converter={StaticResource BoolToVis}}" Background="#800F172A">
+        <!-- Application Level Modal Dialog Overlay Backdrop -->
+        <Grid Grid.ColumnSpan="2" Visibility="{Binding IsModalOpen, Converter={StaticResource BoolToVis}}" Background="#800F172A" Panel.ZIndex="105">
             <Border Width="520" VerticalAlignment="Center" HorizontalAlignment="Center" 
                     Background="#FFFFFF" CornerRadius="12" Padding="24">
                 <Border.Effect>

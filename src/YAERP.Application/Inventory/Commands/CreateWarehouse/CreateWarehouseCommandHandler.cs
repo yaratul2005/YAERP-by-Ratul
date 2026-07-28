@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using YAERP.Application.Common.Interfaces;
 using YAERP.Application.Common.Messaging;
 using YAERP.Domain.Common.Primitives;
-using YAERP.Domain.Inventory;
+using DomainWarehouse = YAERP.Domain.Inventory.Warehouse;
 
 namespace YAERP.Application.Inventory.Commands.CreateWarehouse;
 
@@ -30,7 +30,7 @@ public class CreateWarehouseCommandHandler : ICommandHandler<CreateWarehouseComm
         if (exists)
             return Result.Failure<Guid>(new Error("Warehouse.DuplicateCode", "Warehouse code must be unique.", ErrorType.Conflict));
 
-        var warehouse = Warehouse.Create(
+        var warehouse = DomainWarehouse.Create(
             tenantId,
             request.Code,
             request.Name,

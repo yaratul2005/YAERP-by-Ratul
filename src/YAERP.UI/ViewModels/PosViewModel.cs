@@ -10,6 +10,8 @@ using MediatR;
 using YAERP.Application.Common.Interfaces;
 using YAERP.Application.Sales.DTOs;
 using YAERP.Infrastructure.Hardware;
+using YAERP.UI.ViewModels.Modals;
+using YAERP.UI.Views.Modals;
 
 namespace YAERP.UI.ViewModels;
 
@@ -128,7 +130,7 @@ public partial class PosViewModel : TabViewModelBase
     }
 
     [RelayCommand]
-    private void AddToCart(ProductDto product)
+    public void AddToCart(ProductDto product)
     {
         if (product == null) return;
 
@@ -147,7 +149,7 @@ public partial class PosViewModel : TabViewModelBase
     }
 
     [RelayCommand]
-    private void RemoveFromCart(CartItemDto item)
+    public void RemoveFromCart(CartItemDto item)
     {
         if (item == null) return;
         CurrentCart.Remove(item);
@@ -155,7 +157,7 @@ public partial class PosViewModel : TabViewModelBase
     }
 
     [RelayCommand]
-    private void IncreaseQuantity(CartItemDto item)
+    public void IncreaseQuantity(CartItemDto item)
     {
         if (item == null) return;
         int index = CurrentCart.IndexOf(item);
@@ -167,7 +169,7 @@ public partial class PosViewModel : TabViewModelBase
     }
 
     [RelayCommand]
-    private void DecreaseQuantity(CartItemDto item)
+    public void DecreaseQuantity(CartItemDto item)
     {
         if (item == null) return;
         int index = CurrentCart.IndexOf(item);
@@ -186,7 +188,7 @@ public partial class PosViewModel : TabViewModelBase
     }
 
     [RelayCommand]
-    private void ClearCart()
+    public void ClearCart()
     {
         CurrentCart.Clear();
         RecalculateTotals();
@@ -205,6 +207,33 @@ public partial class PosViewModel : TabViewModelBase
         ChangeDue = SelectedPaymentMethod.Equals("Cash", StringComparison.OrdinalIgnoreCase)
             ? Math.Max(0, CashTendered - GrandTotal)
             : 0;
+    }
+
+    [RelayCommand]
+    public void OpenCashTenderModal()
+    {
+        if (CurrentCart.Count == 0)
+        {
+            ShowErrorToast("Shopping cart is empty. Add products to cart first.");
+            return;
+        }
+
+        var modalVm = new CashTenderModalViewModel(
+            _mediator,
+            _receiptPrinterService,
+            GrandTotal,
+            SubTotal,
+            TaxAmount,
+            CurrentCart.ToList(),
+            onSuccessNotification: message =>
+            {
+                ShowSuccessToast(message);
+                ClearCart();
+            },
+            onCloseRequested: () => CloseModal());
+
+        var view = new CashTenderModal { DataContext = modalVm };
+        OpenModal(view, "Cash Payment & Keypad Tender");
     }
 
     [RelayCommand]

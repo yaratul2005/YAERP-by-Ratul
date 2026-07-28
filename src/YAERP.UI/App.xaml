@@ -4,6 +4,7 @@
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Resources/VectorIcons.xaml"/>
                 <ResourceDictionary Source="Styles/ModernTheme.xaml"/>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>

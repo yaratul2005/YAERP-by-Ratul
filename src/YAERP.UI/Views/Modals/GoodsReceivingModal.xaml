@@ -1,0 +1,99 @@
+<UserControl x:Class="YAERP.UI.Views.Modals.GoodsReceivingModal"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:controls="clr-namespace:YAERP.UI.Controls"
+             mc:Ignorable="d" 
+             d:DesignHeight="600" d:DesignWidth="500"
+             Background="#FFFFFF">
+
+    <StackPanel Margin="8">
+        <!-- Banner Header -->
+        <Border Background="#ECFDF5" BorderBrush="#A7F3D0" BorderThickness="1" CornerRadius="8" Padding="14" Margin="0,0,0,16">
+            <StackPanel Orientation="Horizontal">
+                <controls:SvgIcon Data="{StaticResource Svg.Warehouse}" Width="22" Height="22" Foreground="#059669" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                <StackPanel>
+                    <TextBlock Text="Inbound Goods Receiving Dock" FontSize="15" FontWeight="Bold" Foreground="#065F46"/>
+                    <TextBlock Text="Receive shipments, auto-slot destination bins &amp; log valuation layers" FontSize="12" Foreground="#047857"/>
+                </StackPanel>
+            </StackPanel>
+        </Border>
+
+        <!-- Status Message Banner -->
+        <Border Background="#F8FAFC" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="6" Padding="8" Margin="0,0,0,12"
+                Visibility="{Binding StatusMessage, Converter={StaticResource StringToVisConverter}}">
+            <TextBlock Text="{Binding StatusMessage}" Foreground="#2563EB" FontSize="12" FontWeight="SemiBold"/>
+        </Border>
+
+        <!-- Form Grid -->
+        <UniformGrid Columns="2" Margin="0,0,0,12">
+            <StackPanel Margin="0,0,6,0">
+                <TextBlock Text="Supplier PO Reference:" FontSize="12" FontWeight="Bold" Foreground="#475569" Margin="0,0,0,4"/>
+                <TextBox Text="{Binding SupplierOrderRef, UpdateSourceTrigger=PropertyChanged}" Height="34" Padding="6,4"/>
+            </StackPanel>
+
+            <StackPanel Margin="6,0,0,0">
+                <TextBlock Text="Product Description:" FontSize="12" FontWeight="Bold" Foreground="#475569" Margin="0,0,0,4"/>
+                <TextBox Text="{Binding ProductName, UpdateSourceTrigger=PropertyChanged}" Height="34" Padding="6,4"/>
+            </StackPanel>
+        </UniformGrid>
+
+        <UniformGrid Columns="2" Margin="0,0,0,12">
+            <StackPanel Margin="0,0,6,0">
+                <TextBlock Text="Received Quantity:" FontSize="12" FontWeight="Bold" Foreground="#475569" Margin="0,0,0,4"/>
+                <TextBox Text="{Binding Quantity, UpdateSourceTrigger=PropertyChanged}" Height="34" Padding="6,4"/>
+            </StackPanel>
+
+            <StackPanel Margin="6,0,0,0">
+                <TextBlock Text="Unit Cost ($):" FontSize="12" FontWeight="Bold" Foreground="#475569" Margin="0,0,0,4"/>
+                <TextBox Text="{Binding UnitCost, UpdateSourceTrigger=PropertyChanged}" Height="34" Padding="6,4"/>
+            </StackPanel>
+        </UniformGrid>
+
+        <UniformGrid Columns="2" Margin="0,0,0,12">
+            <StackPanel Margin="0,0,6,0">
+                <TextBlock Text="Total Volume (m³):" FontSize="12" FontWeight="Bold" Foreground="#475569" Margin="0,0,0,4"/>
+                <TextBox Text="{Binding TotalVolume, UpdateSourceTrigger=PropertyChanged}" Height="34" Padding="6,4"/>
+            </StackPanel>
+
+            <StackPanel Margin="6,0,0,0">
+                <TextBlock Text="Total Weight (kg):" FontSize="12" FontWeight="Bold" Foreground="#475569" Margin="0,0,0,4"/>
+                <TextBox Text="{Binding TotalWeight, UpdateSourceTrigger=PropertyChanged}" Height="34" Padding="6,4"/>
+            </StackPanel>
+        </UniformGrid>
+
+        <DockPanel Margin="0,0,0,16">
+            <CheckBox Content="Requires Cold Storage (Temperature Controlled)" IsChecked="{Binding RequiresColdStorage}" VerticalAlignment="Center" FontWeight="SemiBold"/>
+            <Button DockPanel.Dock="Right" Command="{Binding CalculateSlottingCommand}" Content="⚡ Calculate Slotting" Padding="12,6" Background="#059669" Foreground="#FFFFFF" FontWeight="Bold" BorderThickness="0" Cursor="Hand"/>
+        </DockPanel>
+
+        <!-- Recommended Bins DataGrid -->
+        <TextBlock Text="Recommended Destination Bins:" FontSize="12" FontWeight="Bold" Foreground="#475569" Margin="0,0,0,6"/>
+        <DataGrid ItemsSource="{Binding RecommendedBins}" AutoGenerateColumns="False" CanUserAddRows="False" Height="100" Margin="0,0,0,20" GridLinesVisibility="Horizontal" BorderBrush="#E2E8F0">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Bin Code" Binding="{Binding BinCode}" Width="160" FontWeight="Bold"/>
+                <DataGridTextColumn Header="Avail Volume (m³)" Binding="{Binding AvailableVolume, StringFormat=F2}" Width="140"/>
+                <DataGridTextColumn Header="Avail Weight (kg)" Binding="{Binding AvailableWeight, StringFormat=F2}" Width="140"/>
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <!-- Action Bar -->
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="12"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Button Grid.Column="0" Command="{Binding CancelCommand}" Content="Cancel" Height="38" Background="#F1F5F9" Foreground="#475569" FontWeight="Bold" BorderThickness="0" Cursor="Hand"/>
+            
+            <Button Grid.Column="2" Command="{Binding SubmitReceivingCommand}" Height="38" Background="#10B981" Foreground="#FFFFFF" FontWeight="Bold" BorderThickness="0" Cursor="Hand">
+                <StackPanel Orientation="Horizontal">
+                    <controls:SvgIcon Data="{StaticResource Svg.Check}" Width="16" Height="16" Foreground="#FFFFFF" Margin="0,0,6,0"/>
+                    <TextBlock Text="Submit Receiving" VerticalAlignment="Center"/>
+                </StackPanel>
+            </Button>
+        </Grid>
+    </StackPanel>
+</UserControl>

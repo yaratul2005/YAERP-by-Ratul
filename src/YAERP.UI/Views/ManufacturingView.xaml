@@ -3,7 +3,8 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:controls="clr-namespace:YAERP.UI.Views.Controls"
+             xmlns:controls="clr-namespace:YAERP.UI.Controls"
+             xmlns:vm="clr-namespace:YAERP.UI.ViewModels"
              mc:Ignorable="d"
              d:DesignHeight="800" d:DesignWidth="1200"
              Background="#F8FAFC">
@@ -14,61 +15,121 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
+        <!-- Top Header & Vector Toolbar -->
         <DockPanel Grid.Row="0" Margin="0,0,0,24">
             <StackPanel DockPanel.Dock="Left">
-                <TextBlock Text="Manufacturing &amp; MRP Control" FontSize="24" FontWeight="Bold" Foreground="#0F172A"/>
-                <TextBlock Text="Manage bills of materials, capacity scheduling, and demand explosions" FontSize="14" Foreground="#64748B"/>
+                <TextBlock Text="Manufacturing &amp; MRP II Control" FontSize="24" FontWeight="Bold" Foreground="#0F172A"/>
+                <TextBlock Text="Multi-level bill of materials trees, MRP material explosion &amp; shop floor output logs" FontSize="14" Foreground="#64748B"/>
             </StackPanel>
 
-            <Button DockPanel.Dock="Right" HorizontalAlignment="Right" VerticalAlignment="Center"
-                    Content="⚡ Run MRP Explosion" Command="{Binding RunMrpExplosionCommand}"
-                    Padding="16,8" Background="#2563EB" Foreground="White" FontWeight="Bold" BorderThickness="0"  Cursor="Hand"/>
+            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                <!-- [SVG: Plus] Create BOM Button -->
+                <Button Command="{Binding OpenCreateBomModalCommand}" Padding="14,8" Background="#2563EB" Foreground="White" FontWeight="Bold" BorderThickness="0" Margin="0,0,8,0" Cursor="Hand">
+                    <StackPanel Orientation="Horizontal">
+                        <controls:SvgIcon Data="{StaticResource Svg.Plus}" Width="16" Height="16" Foreground="White" Margin="0,0,6,0"/>
+                        <TextBlock Text="Create BOM" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Button>
+
+                <!-- [SVG: Manufacturing] Record Production Output Button -->
+                <Button Command="{Binding OpenShopFloorOutputModalCommand}" Padding="14,8" Background="#059669" Foreground="White" FontWeight="Bold" BorderThickness="0" Margin="0,0,8,0" Cursor="Hand">
+                    <StackPanel Orientation="Horizontal">
+                        <controls:SvgIcon Data="{StaticResource Svg.Manufacturing}" Width="16" Height="16" Foreground="White" Margin="0,0,6,0"/>
+                        <TextBlock Text="Log Production" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Button>
+
+                <!-- Run MRP Explosion Button -->
+                <Button Command="{Binding RunMrpExplosionCommand}" Padding="14,8" Background="#D97706" Foreground="White" FontWeight="Bold" BorderThickness="0" Margin="0,0,8,0" Cursor="Hand">
+                    <StackPanel Orientation="Horizontal">
+                        <controls:SvgIcon Data="{StaticResource Svg.Manufacturing}" Width="16" Height="16" Foreground="White" Margin="0,0,6,0"/>
+                        <TextBlock Text="Run MRP Explosion" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Button>
+
+                <!-- [SVG: Refresh] Refresh Button -->
+                <Button Command="{Binding RefreshDataCommand}" Padding="12,8" Background="#F1F5F9" Foreground="#475569" FontWeight="Bold" BorderThickness="0" Cursor="Hand">
+                    <StackPanel Orientation="Horizontal">
+                        <controls:SvgIcon Data="{StaticResource Svg.Refresh}" Width="16" Height="16" Foreground="#475569" Margin="0,0,6,0"/>
+                        <TextBlock Text="Refresh" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Button>
+            </StackPanel>
         </DockPanel>
 
+        <!-- Main Tab Control -->
         <TabControl Grid.Row="1" Background="White" BorderBrush="#E2E8F0" BorderThickness="1">
 
-            <TabItem Header="🌲 BOM Explorer">
+            <!-- Multi-Level BOM Tree Tab -->
+            <TabItem Header="🌲 Interactive BOM Tree">
                 <Grid Margin="16">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="300"/>
+                        <ColumnDefinition Width="260"/>
+                        <ColumnDefinition Width="12"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
 
-                    <Border Grid.Column="0" BorderBrush="#E2E8F0" BorderThickness="0,0,1,0" Margin="0,0,16,0">
-                        <ListBox ItemsSource="{Binding ActiveBoms}" BorderThickness="0">
-                            <ListBox.ItemTemplate>
-                                <DataTemplate>
-                                    <StackPanel Margin="0,8">
-                                        <TextBlock Text="{Binding AssemblyName}" FontWeight="SemiBold"/>
-                                        <TextBlock Text="{Binding RevisionCode}" FontSize="12" Foreground="#64748B"/>
-                                    </StackPanel>
-                                </DataTemplate>
-                            </ListBox.ItemTemplate>
-                        </ListBox>
+                    <Border Grid.Column="0" Background="#F8FAFC" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="8" Padding="10">
+                        <DockPanel>
+                            <TextBlock Text="Active BOM Master List" DockPanel.Dock="Top" FontWeight="Bold" Foreground="#334155" Margin="0,0,0,8"/>
+                            <ListBox ItemsSource="{Binding ActiveBoms}" BorderThickness="0" Background="Transparent">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Margin="0,6">
+                                            <TextBlock Text="{Binding AssemblyName}" FontWeight="Bold" Foreground="#0F172A"/>
+                                            <TextBlock Text="{Binding RevisionCode}" FontSize="11" Foreground="#64748B"/>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+                        </DockPanel>
                     </Border>
 
-                    <StackPanel Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center">
-                        <TextBlock Text="Select an assembly to view its Multi-Level BOM tree." Foreground="#94A3B8" FontSize="14"/>
-                    </StackPanel>
+                    <!-- Interactive TreeView -->
+                    <Border Grid.Column="2" Background="White" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="8" Padding="14">
+                        <DockPanel>
+                            <TextBlock Text="Multi-Level Hierarchical BOM Structure &amp; Yield Badges" DockPanel.Dock="Top" FontSize="15" FontWeight="Bold" Foreground="#0F172A" Margin="0,0,0,12"/>
+                            
+                            <TreeView ItemsSource="{Binding BomTreeNodes}" BorderThickness="0">
+                                <TreeView.ItemTemplate>
+                                    <HierarchicalDataTemplate DataType="{x:Type vm:BomTreeNodeViewModel}" ItemsSource="{Binding Children}">
+                                        <Border Background="#F8FAFC" BorderBrush="#CBD5E1" BorderThickness="1" CornerRadius="6" Padding="8,4" Margin="0,2">
+                                            <StackPanel Orientation="Horizontal">
+                                                <controls:SvgIcon Data="{StaticResource Svg.Manufacturing}" Width="14" Height="14" Foreground="#2563EB" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                                                <TextBlock Text="{Binding NodeName}" FontWeight="Bold" Foreground="#0F172A" VerticalAlignment="Center"/>
+                                                <TextBlock Text="{Binding SkuCode, StringFormat=' [{0}]'}" Foreground="#64748B" FontSize="11" VerticalAlignment="Center" Margin="0,0,12,0"/>
+                                                
+                                                <Border Background="#DBEAFE" CornerRadius="4" Padding="6,2" Margin="0,0,6,0">
+                                                    <TextBlock Text="{Binding QuantityPerAssembly, StringFormat='Qty: {0}'}" FontSize="11" FontWeight="Bold" Foreground="#1E40AF"/>
+                                                </Border>
+
+                                                <Border Background="#D1FAE5" CornerRadius="4" Padding="6,2">
+                                                    <TextBlock Text="{Binding YieldPercent, StringFormat='Yield: {0}%'}" FontSize="11" FontWeight="Bold" Foreground="#065F46"/>
+                                                </Border>
+                                            </StackPanel>
+                                        </Border>
+                                    </HierarchicalDataTemplate>
+                                </TreeView.ItemTemplate>
+                            </TreeView>
+                        </DockPanel>
+                    </Border>
                 </Grid>
             </TabItem>
 
+            <!-- Work Center Schedule Tab -->
             <TabItem Header="🏭 Work Center Schedule">
                 <Grid Margin="16">
                     <DataGrid ItemsSource="{Binding ActiveWorkOrders}" AutoGenerateColumns="False" CanUserAddRows="False"
-                              GridLinesVisibility="Horizontal" BorderBrush="#E2E8F0" HeadersVisibility="Column" RowHeight="40">
+                               GridLinesVisibility="Horizontal" BorderBrush="#E2E8F0" HeadersVisibility="Column" RowHeight="42">
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="Work Order" Binding="{Binding WorkOrderNumber}" Width="150"/>
+                            <DataGridTextColumn Header="Work Order" Binding="{Binding WorkOrderNumber}" Width="150" FontWeight="Bold"/>
                             <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="120"/>
-                            <DataGridTextColumn Header="Target Qty" Binding="{Binding TargetQuantity}" Width="100"/>
-                            <DataGridTextColumn Header="Completed Qty" Binding="{Binding CompletedQuantity}" Width="120"/>
-                            <DataGridTemplateColumn Header="Actions" Width="*">
+                            <DataGridTextColumn Header="Target Qty" Binding="{Binding TargetQuantity}" Width="120"/>
+                            <DataGridTextColumn Header="Completed Qty" Binding="{Binding CompletedQuantity}" Width="130" FontWeight="Bold" Foreground="#059669"/>
+                            <DataGridTemplateColumn Header="Shop Floor Actions" Width="*">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
-                                        <StackPanel Orientation="Horizontal">
-                                            <Button Content="Release" Command="{Binding DataContext.ReleaseWorkOrderCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}" CommandParameter="{Binding}" Margin="0,0,8,0" Padding="8,4"/>
-                                            <Button Content="Record Output" Command="{Binding DataContext.RecordProductionOutputCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}" CommandParameter="{Binding}" Padding="8,4"/>
-                                        </StackPanel>
+                                        <Button Command="{Binding DataContext.OpenShopFloorOutputModalCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}" CommandParameter="{Binding}" Content="⚙️ Record Output" Padding="10,4" Background="#2563EB" Foreground="White" FontWeight="Bold" BorderThickness="0" Cursor="Hand"/>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
@@ -77,28 +138,18 @@
                 </Grid>
             </TabItem>
 
+            <!-- MRP Demand Matrix Tab -->
             <TabItem Header="📈 MRP Demand Matrix">
                 <Grid Margin="16">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="*"/>
-                        <RowDefinition Height="Auto"/>
-                    </Grid.RowDefinitions>
-
-                    <DataGrid Grid.Row="0" ItemsSource="{Binding MrpSchedule}" AutoGenerateColumns="False" CanUserAddRows="False"
-                              VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.VirtualizationMode="Recycling"
-                              GridLinesVisibility="Horizontal" BorderBrush="#E2E8F0" HeadersVisibility="Column" RowHeight="40">
+                    <DataGrid ItemsSource="{Binding MrpSchedule}" AutoGenerateColumns="False" CanUserAddRows="False"
+                               GridLinesVisibility="Horizontal" BorderBrush="#E2E8F0" HeadersVisibility="Column" RowHeight="42">
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="Product" Binding="{Binding ProductName}" Width="200"/>
-                            <DataGridTextColumn Header="Gross Req." Binding="{Binding GrossRequirement}" Width="100"/>
-                            <DataGridTextColumn Header="On Hand" Binding="{Binding OnHand}" Width="100"/>
-                            <DataGridTextColumn Header="Net Req." Binding="{Binding NetRequirement}" Width="100" FontWeight="Bold"/>
+                            <DataGridTextColumn Header="Product Name" Binding="{Binding ProductName}" Width="250" FontWeight="Bold"/>
+                            <DataGridTextColumn Header="Gross Requirement" Binding="{Binding GrossRequirement, StringFormat=N0}" Width="160"/>
+                            <DataGridTextColumn Header="On Hand Stock" Binding="{Binding OnHand, StringFormat=N0}" Width="140"/>
+                            <DataGridTextColumn Header="Net Requirement" Binding="{Binding NetRequirement, StringFormat=N0}" Width="160" FontWeight="Bold" Foreground="#DC2626"/>
                         </DataGrid.Columns>
                     </DataGrid>
-
-                    <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,16,0,0">
-                        <Button Content="[Release Purchase Orders]" Padding="12,6" Background="#F59E0B" Foreground="White" BorderThickness="0" Margin="0,0,12,0"/>
-                        <Button Content="[Release Work Orders]" Padding="12,6" Background="#10B981" Foreground="White" BorderThickness="0"/>
-                    </StackPanel>
                 </Grid>
             </TabItem>
 

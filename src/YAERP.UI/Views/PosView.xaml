@@ -1,6 +1,7 @@
 <UserControl x:Class="YAERP.UI.Views.PosView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="clr-namespace:YAERP.UI.Controls"
              Background="{StaticResource BackgroundCanvasBrush}"
              PreviewKeyDown="UserControl_PreviewKeyDown">
     <UserControl.Resources>
@@ -13,8 +14,8 @@
             <StackPanel DockPanel.Dock="Top" Margin="0,0,0,16">
                 <DockPanel>
                     <StackPanel DockPanel.Dock="Left">
-                        <TextBlock Text="Express POS Terminal &amp; Hardware Checkout" FontSize="26" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}"/>
-                        <TextBlock Text="Touch-optimized register, barcode HID scanner listener, thermal receipt ESC/POS printer, &amp; cash drawer interop" FontSize="13" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,4,0,0"/>
+                        <TextBlock Text="Express Touch POS Terminal &amp; Hardware Interop" FontSize="26" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}"/>
+                        <TextBlock Text="Touch-optimized register, barcode HID scanner listener, thermal receipt ESC/POS printer &amp; cash tender keypad" FontSize="13" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,4,0,0"/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
                         <Border Background="#EFF6FF" BorderBrush="#93C5FD" BorderThickness="1" CornerRadius="8" Padding="10,6" Margin="0,0,10,0">
@@ -107,51 +108,34 @@
                                 </StackPanel>
                             </Border>
 
-                            <!-- Payment Method & Tendered Controls -->
-                            <Grid Margin="0,0,0,14">
+                            <!-- Tender Action Buttons Bar -->
+                            <Grid Margin="0,0,0,12">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="8"/>
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
 
-                                <StackPanel Grid.Column="0" Margin="0,0,6,0">
-                                    <TextBlock Text="Payment Method:" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,4"/>
-                                    <ComboBox SelectedValue="{Binding SelectedPaymentMethod}" SelectedValuePath="Content" Padding="8,6">
-                                        <ComboBoxItem Content="Cash"/>
-                                        <ComboBoxItem Content="Credit Card"/>
-                                        <ComboBoxItem Content="QR Code"/>
-                                    </ComboBox>
-                                </StackPanel>
+                                <Button Grid.Column="0" Command="{Binding OpenCashTenderModalCommand}" Height="40" Background="#16A34A" Foreground="#FFFFFF" FontWeight="Bold" BorderThickness="0" Cursor="Hand">
+                                    <StackPanel Orientation="Horizontal">
+                                        <controls:SvgIcon Data="{StaticResource Svg.POS}" Width="16" Height="16" Foreground="#FFFFFF" Margin="0,0,6,0"/>
+                                        <TextBlock Text="💵 Touch Cash Tender Keypad" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                </Button>
 
-                                <StackPanel Grid.Column="1" Margin="6,0,0,0">
-                                    <TextBlock Text="Cash Tendered ($):" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,4"/>
-                                    <TextBox Text="{Binding CashTendered, StringFormat='{}{0:F2}', UpdateSourceTrigger=PropertyChanged}" Padding="8,6" FontWeight="Bold" Background="#F1F5F9"/>
-                                </StackPanel>
+                                <Button Grid.Column="2" Command="{Binding CompleteTransactionCommand}" Height="40" Background="#2563EB" Foreground="#FFFFFF" FontWeight="Bold" BorderThickness="0" Cursor="Hand">
+                                    <StackPanel Orientation="Horizontal">
+                                        <controls:SvgIcon Data="{StaticResource Svg.Check}" Width="16" Height="16" Foreground="#FFFFFF" Margin="0,0,6,0"/>
+                                        <TextBlock Text="💳 Express Card Pay" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                </Button>
                             </Grid>
-
-                            <!-- Change Due Callout -->
-                            <Border Background="#F0FDF4" BorderBrush="#86EFAC" BorderThickness="1" CornerRadius="6" Padding="10,8" Margin="0,0,0,14">
-                                <DockPanel>
-                                    <TextBlock Text="Change Due:" FontSize="13" FontWeight="Bold" Foreground="#065F46"/>
-                                    <TextBlock Text="{Binding ChangeDue, StringFormat='{}{0:C2}'}" FontSize="16" FontWeight="Bold" Foreground="#047857" HorizontalAlignment="Right"/>
-                                </DockPanel>
-                            </Border>
 
                             <!-- Hardware Toggles -->
                             <StackPanel Orientation="Horizontal" Margin="0,0,0,14">
                                 <CheckBox IsChecked="{Binding AutoPrintReceipt}" Content="🖨️ Auto-Print Receipt" Margin="0,0,16,0" VerticalAlignment="Center"/>
                                 <CheckBox IsChecked="{Binding AutoOpenCashDrawer}" Content="💰 Kick Cash Drawer" VerticalAlignment="Center"/>
                             </StackPanel>
-
-                            <!-- Big Checkout Button -->
-                            <Button Command="{Binding CompleteTransactionCommand}" Height="52" Background="#10B981" Foreground="#FFFFFF" 
-                                    FontSize="16" FontWeight="Bold" BorderThickness="0" Cursor="Hand">
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="💳  PAY &amp; COMPLETE CHECKOUT (" VerticalAlignment="Center"/>
-                                    <TextBlock Text="{Binding GrandTotal, StringFormat='{}{0:C2}'}" VerticalAlignment="Center"/>
-                                    <TextBlock Text=")" VerticalAlignment="Center"/>
-                                </StackPanel>
-                            </Button>
                         </StackPanel>
 
                         <!-- Cart Items DataGrid -->

@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using YAERP.Application.Common.Plugins;
+using YAERP.UI.ViewModels.Drawers;
+using YAERP.UI.Views.Drawers;
 
 namespace YAERP.UI.ViewModels;
 
@@ -34,8 +36,14 @@ public partial class PluginHubViewModel : TabViewModelBase
         RefreshPlugins();
     }
 
+    public override async Task OnTabActivatedAsync()
+    {
+        RefreshPlugins();
+        await Task.CompletedTask;
+    }
+
     [RelayCommand]
-    private void RefreshPlugins()
+    public void RefreshPlugins()
     {
         try
         {
@@ -50,7 +58,7 @@ public partial class PluginHubViewModel : TabViewModelBase
 
             StatusMessage = ActivePlugins.Count > 0
                 ? $"Loaded {ActivePlugins.Count} active assembly plugin(s) via isolated AssemblyLoadContext."
-                : $"No dynamic assembly plugins (.dll) found in '{PluginsFolderPath}'.";
+                : $"No dynamic assembly plugins (.dll) found in '{PluginsFolderPath}'. Active AssemblyLoadContext sandbox ready.";
         }
         catch (Exception ex)
         {
@@ -59,7 +67,26 @@ public partial class PluginHubViewModel : TabViewModelBase
     }
 
     [RelayCommand]
-    private void OpenPluginsDirectory()
+    public void OpenPluginLogStreamerDrawer(IYaerpPlugin? plugin)
+    {
+        var id = plugin?.PluginId ?? "YAERP.Plugin.BarcodeExt";
+        var name = plugin?.Name ?? "Barcode & RFID Scanner Interop";
+        var ver = plugin?.Version ?? "1.0.4";
+        var author = plugin?.Author ?? "Ratul Systems Engineering";
+
+        var drawerVm = new PluginLogStreamerDrawerViewModel(
+            id,
+            name,
+            ver,
+            author,
+            onCloseRequested: () => CloseDrawer());
+
+        var view = new PluginLogStreamerDrawer { DataContext = drawerVm };
+        OpenDrawer(view, $"Plugin Assembly Sandbox Logs - {name}");
+    }
+
+    [RelayCommand]
+    public void OpenPluginsDirectory()
     {
         try
         {

@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:controls="clr-namespace:YAERP.UI.Controls"
              mc:Ignorable="d"
              d:DesignHeight="800" d:DesignWidth="1200"
              Background="#F8FAFC">
@@ -13,21 +14,52 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
+        <!-- Top Header & Vector Toolbar -->
         <DockPanel Grid.Row="0" Margin="0,0,0,24">
             <StackPanel DockPanel.Dock="Left">
-                <TextBlock Text="Deep Financials &amp; Tax Control" FontSize="24" FontWeight="Bold" Foreground="#0F172A"/>
-                <TextBlock Text="Manage Fixed Assets, Multi-Currency Revaluations, and Regional Tax filings" FontSize="14" Foreground="#64748B"/>
+                <TextBlock Text="Deep Financials &amp; General Ledger" FontSize="24" FontWeight="Bold" Foreground="#0F172A"/>
+                <TextBlock Text="Fixed asset depreciation, multi-currency forex revaluations &amp; tax compliance" FontSize="14" Foreground="#64748B"/>
             </StackPanel>
 
             <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
-                <Button Content="💱 Run Forex Revaluation" Command="{Binding ExecuteForexRevaluationCommand}" Padding="16,8" Background="#10B981" Foreground="White" FontWeight="Bold" BorderThickness="0" Margin="0,0,12,0"/>
-                <Button Content="📉 Post Depreciations" Command="{Binding RunDepreciationPostingCommand}" Padding="16,8" Background="#2563EB" Foreground="White" FontWeight="Bold" BorderThickness="0"/>
+                <!-- [SVG: Plus] Post Journal Entry Button -->
+                <Button Command="{Binding OpenCreateJournalModalCommand}" Padding="14,8" Background="#2563EB" Foreground="White" FontWeight="Bold" BorderThickness="0" Margin="0,0,8,0" Cursor="Hand">
+                    <StackPanel Orientation="Horizontal">
+                        <controls:SvgIcon Data="{StaticResource Svg.Plus}" Width="16" Height="16" Foreground="White" Margin="0,0,6,0"/>
+                        <TextBlock Text="Post Journal Entry" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Button>
+
+                <!-- [SVG: Finance] Run Depreciation Button -->
+                <Button Command="{Binding OpenAssetDrawerCommand}" Padding="14,8" Background="#10B981" Foreground="White" FontWeight="Bold" BorderThickness="0" Margin="0,0,8,0" Cursor="Hand">
+                    <StackPanel Orientation="Horizontal">
+                        <controls:SvgIcon Data="{StaticResource Svg.Finance}" Width="16" Height="16" Foreground="White" Margin="0,0,6,0"/>
+                        <TextBlock Text="Asset Inspector" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Button>
+
+                <!-- [SVG: Export] Generate Tax Return Button -->
+                <Button Command="{Binding GenerateTaxReturnCommand}" Padding="14,8" Background="#F59E0B" Foreground="White" FontWeight="Bold" BorderThickness="0" Margin="0,0,8,0" Cursor="Hand">
+                    <StackPanel Orientation="Horizontal">
+                        <controls:SvgIcon Data="{StaticResource Svg.Export}" Width="16" Height="16" Foreground="White" Margin="0,0,6,0"/>
+                        <TextBlock Text="Tax Return" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Button>
+
+                <!-- [SVG: Refresh] Refresh Button -->
+                <Button Command="{Binding RefreshFinancialsDataCommand}" Padding="12,8" Background="#F1F5F9" Foreground="#475569" FontWeight="Bold" BorderThickness="0" Cursor="Hand">
+                    <StackPanel Orientation="Horizontal">
+                        <controls:SvgIcon Data="{StaticResource Svg.Refresh}" Width="16" Height="16" Foreground="#475569" Margin="0,0,6,0"/>
+                        <TextBlock Text="Refresh" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Button>
             </StackPanel>
         </DockPanel>
 
+        <!-- Main Tab Control -->
         <TabControl Grid.Row="1" Background="White" BorderBrush="#E2E8F0" BorderThickness="1">
 
-            <!-- Fixed Assets & Depreciation -->
+            <!-- Fixed Asset Register Tab -->
             <TabItem Header="🚜 Fixed Asset Register">
                 <Grid Margin="16">
                     <Grid.RowDefinitions>
@@ -36,31 +68,38 @@
                     </Grid.RowDefinitions>
 
                     <DataGrid Grid.Row="0" ItemsSource="{Binding AssetRegister}" AutoGenerateColumns="False" CanUserAddRows="False"
-                              GridLinesVisibility="Horizontal" BorderBrush="#E2E8F0" HeadersVisibility="Column" RowHeight="40" Margin="0,0,0,16">
+                               GridLinesVisibility="Horizontal" BorderBrush="#E2E8F0" HeadersVisibility="Column" RowHeight="42" Margin="0,0,0,16">
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="Asset Tag" Binding="{Binding AssetTag}" Width="150" FontWeight="SemiBold"/>
+                            <DataGridTextColumn Header="Asset Tag" Binding="{Binding AssetTag}" Width="150" FontWeight="Bold"/>
                             <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="250"/>
-                            <DataGridTextColumn Header="Book Value" Binding="{Binding BookValue, StringFormat=C}" Width="150"/>
+                            <DataGridTextColumn Header="Book Value" Binding="{Binding BookValue, StringFormat=C}" Width="150" FontWeight="Bold"/>
                             <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="120"/>
+                            <DataGridTemplateColumn Header="Asset Actions" Width="*">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Button Command="{Binding DataContext.OpenAssetDrawerCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}" CommandParameter="{Binding}" Content="🔍 Inspect &amp; Depreciate" Padding="10,4" Background="#2563EB" Foreground="White" FontWeight="Bold" BorderThickness="0" Cursor="Hand"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
                         </DataGrid.Columns>
                     </DataGrid>
 
                     <DataGrid Grid.Row="1" ItemsSource="{Binding PendingDepreciations}" AutoGenerateColumns="False" CanUserAddRows="False"
-                              GridLinesVisibility="Horizontal" BorderBrush="#E2E8F0" HeadersVisibility="Column" RowHeight="40">
+                               GridLinesVisibility="Horizontal" BorderBrush="#E2E8F0" HeadersVisibility="Column" RowHeight="40">
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="Period" Binding="{Binding Period}" Width="150"/>
-                            <DataGridTextColumn Header="Depreciation Amount" Binding="{Binding Amount, StringFormat=C}" Width="180" Foreground="#DC2626" FontWeight="SemiBold"/>
+                            <DataGridTextColumn Header="Period" Binding="{Binding Period}" Width="150" FontWeight="Bold"/>
+                            <DataGridTextColumn Header="Depreciation Amount" Binding="{Binding Amount, StringFormat=C}" Width="180" Foreground="#DC2626" FontWeight="Bold"/>
                             <DataGridTextColumn Header="Book Value After" Binding="{Binding BookValueAfter, StringFormat=C}" Width="180"/>
                         </DataGrid.Columns>
                     </DataGrid>
                 </Grid>
             </TabItem>
 
-            <!-- Forex Revaluation -->
+            <!-- Forex Revaluation Tab -->
             <TabItem Header="💱 Forex Exposure Monitor">
                 <Grid Margin="16">
                     <DataGrid ItemsSource="{Binding ForexExposures}" AutoGenerateColumns="False" CanUserAddRows="False"
-                              GridLinesVisibility="Horizontal" BorderBrush="#E2E8F0" HeadersVisibility="Column" RowHeight="40">
+                               GridLinesVisibility="Horizontal" BorderBrush="#E2E8F0" HeadersVisibility="Column" RowHeight="42">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Currency" Binding="{Binding Currency}" Width="150" FontWeight="Bold"/>
                             <DataGridTextColumn Header="Foreign Balance" Binding="{Binding ForeignBalance, StringFormat=N2}" Width="200"/>
@@ -70,25 +109,18 @@
                 </Grid>
             </TabItem>
 
-            <!-- Tax Returns -->
+            <!-- Tax Returns Tab -->
             <TabItem Header="⚖️ Tax &amp; VAT Filings">
                 <Grid Margin="16">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="*"/>
-                        <RowDefinition Height="Auto"/>
-                    </Grid.RowDefinitions>
-
-                    <DataGrid Grid.Row="0" ItemsSource="{Binding TaxSummaries}" AutoGenerateColumns="False" CanUserAddRows="False"
-                              GridLinesVisibility="Horizontal" BorderBrush="#E2E8F0" HeadersVisibility="Column" RowHeight="40">
+                    <DataGrid ItemsSource="{Binding TaxSummaries}" AutoGenerateColumns="False" CanUserAddRows="False"
+                               GridLinesVisibility="Horizontal" BorderBrush="#E2E8F0" HeadersVisibility="Column" RowHeight="42">
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="Period" Binding="{Binding Period}" Width="150"/>
+                            <DataGridTextColumn Header="Period" Binding="{Binding Period}" Width="150" FontWeight="Bold"/>
                             <DataGridTextColumn Header="Output VAT (Collected)" Binding="{Binding OutputVat, StringFormat=C}" Width="200"/>
                             <DataGridTextColumn Header="Input VAT (Paid)" Binding="{Binding InputVat, StringFormat=C}" Width="200"/>
                             <DataGridTextColumn Header="Net Liability" Binding="{Binding NetLiability, StringFormat=C}" Width="200" FontWeight="Bold"/>
                         </DataGrid.Columns>
                     </DataGrid>
-
-                    <Button Grid.Row="1" Content="📄 Generate Tax Return" Command="{Binding GenerateTaxReturnCommand}" Padding="16,8" Background="#F59E0B" Foreground="White" FontWeight="Bold" BorderThickness="0" HorizontalAlignment="Right" Margin="0,16,0,0"/>
                 </Grid>
             </TabItem>
 
