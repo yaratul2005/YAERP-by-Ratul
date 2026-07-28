@@ -14,6 +14,7 @@ using YAERP.Infrastructure;
 using YAERP.Infrastructure.Hardware;
 using YAERP.UI.Services;
 using YAERP.UI.ViewModels;
+using YAERP.UI.ViewModels.Security;
 using YAERP.UI.Views;
 
 namespace YAERP.UI;
@@ -66,9 +67,10 @@ public partial class App : System.Windows.Application
                     // Register Hardware Helpers
                     services.AddSingleton<BarcodeScannerListener>();
 
-                    // Register Navigation, Workspace, Command Palette, Modal Service & Main Window
+                    // Register Navigation, Workspace, Command Palette, Dialog Service, Modal Service & Main Window
                     services.AddSingleton<INavigationService, NavigationService>();
                     services.AddSingleton<IModalService, ModalService>();
+                    services.AddSingleton<IDialogService, DialogService>();
                     services.AddSingleton<ITabWorkspaceService, TabWorkspaceService>();
                     services.AddSingleton<ICommandPaletteService, CommandPaletteService>();
                     services.AddSingleton<MainWindow>();
@@ -85,6 +87,7 @@ public partial class App : System.Windows.Application
                     services.AddTransient<ManufacturingViewModel>();
                     services.AddTransient<WarehouseManagementViewModel>();
                     services.AddTransient<DeepFinancialsViewModel>();
+                    services.AddTransient<UserAndRolesViewModel>();
                 })
                 .Build();
         }
