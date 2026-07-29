@@ -14,42 +14,58 @@
 
         <!-- Top Control Toolbar -->
         <Border Grid.Row="0" Background="White" Padding="16" BorderBrush="#E2E8F0" BorderThickness="0,0,0,1">
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                <Button Command="{Binding OpenCreateUserModalCommand}" Style="{DynamicResource PrimaryButtonStyle}" Margin="0,0,8,0">
-                    <StackPanel Orientation="Horizontal">
-                        <controls:SvgIcon Data="{StaticResource Svg.Plus}" Width="16" Height="16" Foreground="White" Margin="0,0,8,0"/>
-                        <TextBlock Text="New User"/>
-                    </StackPanel>
-                </Button>
-                <Button Command="{Binding OpenEditRoleModalCommand}" Style="{DynamicResource SecondaryButtonStyle}" Margin="0,0,8,0">
-                    <StackPanel Orientation="Horizontal">
-                        <controls:SvgIcon Data="{StaticResource Svg.Lock}" Width="16" Height="16" Foreground="#0F172A" Margin="0,0,8,0"/>
-                        <TextBlock Text="New Role"/>
-                    </StackPanel>
-                </Button>
-                <Button Style="{DynamicResource GhostButtonStyle}" Margin="0,0,8,0" ToolTip="Refresh Directory">
-                    <controls:SvgIcon Data="{StaticResource Svg.Refresh}" Width="16" Height="16" Foreground="#64748B"/>
-                </Button>
-                <Button Style="{DynamicResource GhostButtonStyle}" ToolTip="Export Audit Log">
-                    <controls:SvgIcon Data="{StaticResource Svg.Export}" Width="16" Height="16" Foreground="#64748B"/>
-                </Button>
-            </StackPanel>
+            <DockPanel>
+                <StackPanel DockPanel.Dock="Left" VerticalAlignment="Center">
+                    <TextBlock Text="Identity &amp; Role-Based Access Control (IAM)" FontSize="18" FontWeight="Bold" Foreground="#0F172A"/>
+                    <TextBlock Text="Manage user accounts, roles, field permissions, and security audit trails" FontSize="12" Foreground="#64748B"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                    <Button Command="{Binding OpenCreateUserModalCommand}" Style="{DynamicResource PrimaryButtonStyle}" Margin="0,0,8,0">
+                        <StackPanel Orientation="Horizontal">
+                            <controls:SvgIcon Data="{StaticResource Svg.Plus}" Width="16" Height="16" Foreground="White" Margin="0,0,8,0"/>
+                            <TextBlock Text="New User"/>
+                        </StackPanel>
+                    </Button>
+                    <Button Command="{Binding OpenEditRoleModalCommand}" Style="{DynamicResource SecondaryButtonStyle}" Margin="0,0,8,0">
+                        <StackPanel Orientation="Horizontal">
+                            <controls:SvgIcon Data="{StaticResource Svg.Lock}" Width="16" Height="16" Foreground="#0F172A" Margin="0,0,8,0"/>
+                            <TextBlock Text="New Role"/>
+                        </StackPanel>
+                    </Button>
+                    <Button Command="{Binding RefreshDirectoryCommand}" Style="{DynamicResource GhostButtonStyle}" Margin="0,0,8,0" ToolTip="Refresh Directory">
+                        <controls:SvgIcon Data="{StaticResource Svg.Refresh}" Width="16" Height="16" Foreground="#64748B"/>
+                    </Button>
+                    <Button Command="{Binding ExportAuditLogCommand}" Style="{DynamicResource GhostButtonStyle}" ToolTip="Export Audit Log">
+                        <controls:SvgIcon Data="{StaticResource Svg.Export}" Width="16" Height="16" Foreground="#64748B"/>
+                    </Button>
+                </StackPanel>
+            </DockPanel>
         </Border>
 
         <!-- Sub-Tab Layout -->
         <TabControl Grid.Row="1" Margin="16" Background="Transparent" BorderThickness="0">
             <!-- User Directory -->
             <TabItem Header="User Directory">
-                <DataGrid ItemsSource="{Binding Users}" AutoGenerateColumns="False" CanUserAddRows="False" Background="White" RowHeight="48">
+                <DataGrid ItemsSource="{Binding Users}" AutoGenerateColumns="False" CanUserAddRows="False" Background="White" RowHeight="48" Margin="0,8,0,0">
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="Full Name" Binding="{Binding FullName}" Width="200"/>
                         <DataGridTextColumn Header="Username" Binding="{Binding Username}" Width="150"/>
-                        <DataGridTextColumn Header="Department" Binding="{Binding Department}" Width="150"/>
-                        <DataGridTemplateColumn Header="Status" Width="100">
+                        <DataGridTextColumn Header="Department" Binding="{Binding Department}" Width="180"/>
+                        <DataGridTemplateColumn Header="Status" Width="120">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
-                                    <Border Background="{Binding IsActive, Converter={StaticResource StatusToColorConverter}}" CornerRadius="12" Padding="8,4" HorizontalAlignment="Center">
-                                        <TextBlock Text="{Binding IsActive}" Foreground="White" FontSize="11"/>
+                                    <Border CornerRadius="12" Padding="10,4" HorizontalAlignment="Center">
+                                        <Border.Style>
+                                            <Style TargetType="Border">
+                                                <Setter Property="Background" Value="#10B981"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsActive}" Value="False">
+                                                        <Setter Property="Background" Value="#EF4444"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Border.Style>
+                                        <TextBlock Text="{Binding IsActive, StringFormat='Active: {0}'}" Foreground="White" FontSize="11" FontWeight="Bold"/>
                                     </Border>
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
@@ -57,7 +73,7 @@
                         <DataGridTemplateColumn Header="Actions" Width="*">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
-                                    <StackPanel Orientation="Horizontal">
+                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                                         <Button Command="{Binding DataContext.ResetPasswordCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
                                                 CommandParameter="{Binding Id}" Content="Reset Pwd" Style="{DynamicResource GhostButtonStyle}" Margin="0,0,8,0"/>
                                         <Button Command="{Binding DataContext.ToggleUserStatusCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
@@ -72,31 +88,54 @@
 
             <!-- Permission Matrix Editor -->
             <TabItem Header="Permission Matrix">
-                <Grid Background="White">
+                <Grid Background="White" Margin="0,8,0,0">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="250"/>
+                        <ColumnDefinition Width="280"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
 
-                    <ListBox Grid.Column="0" ItemsSource="{Binding Roles}" DisplayMemberPath="Name" SelectedItem="{Binding SelectedRole}" BorderThickness="0,0,1,0" BorderBrush="#E2E8F0"/>
+                    <Border Grid.Column="0" Grid.RowSpan="2" BorderThickness="0,0,1,0" BorderBrush="#E2E8F0">
+                        <DockPanel>
+                            <TextBlock Text="Select System Role" DockPanel.Dock="Top" FontSize="13" FontWeight="Bold" Foreground="#0F172A" Margin="12,12,12,8"/>
+                            <ListBox ItemsSource="{Binding Roles}" DisplayMemberPath="Name" SelectedItem="{Binding SelectedRole}" BorderThickness="0"/>
+                        </DockPanel>
+                    </Border>
 
-                    <!-- Interactive Checkbox Tree grouped by Module -->
-                    <TreeView Grid.Column="1" ItemsSource="{Binding PermissionTree}" Margin="16" BorderThickness="0">
-                        <TreeView.ItemTemplate>
-                            <HierarchicalDataTemplate>
-                                <StackPanel Orientation="Horizontal" Margin="0,4">
-                                    <CheckBox IsChecked="{Binding IsGranted}" Content="{Binding Name}" VerticalAlignment="Center"/>
-                                    <TextBlock Text="{Binding Code}" Foreground="#94A3B8" Margin="8,0,0,0" FontSize="11" VerticalAlignment="Center"/>
-                                </StackPanel>
-                            </HierarchicalDataTemplate>
-                        </TreeView.ItemTemplate>
-                    </TreeView>
+                    <!-- Interactive Checkbox List grouped by Module -->
+                    <DockPanel Grid.Column="1" Grid.Row="0">
+                        <TextBlock Text="Role Privileges &amp; Actions" DockPanel.Dock="Top" FontSize="13" FontWeight="Bold" Foreground="#0F172A" Margin="16,12,16,8"/>
+                        <ItemsControl ItemsSource="{Binding PermissionTree}" Margin="16,0">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border BorderBrush="#F1F5F9" BorderThickness="0,0,0,1" Padding="8">
+                                        <DockPanel>
+                                            <CheckBox IsChecked="{Binding IsGranted}" Content="{Binding Name}" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                            <TextBlock Text="{Binding Code}" Foreground="#94A3B8" FontSize="11" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                                        </DockPanel>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </DockPanel>
+
+                    <Border Grid.Column="1" Grid.Row="1" Padding="16" Background="#F8FAFC" BorderBrush="#E2E8F0" BorderThickness="0,1,0,0">
+                        <Button Command="{Binding SaveRolePermissionsCommand}" Style="{DynamicResource PrimaryButtonStyle}" HorizontalAlignment="Right">
+                            <StackPanel Orientation="Horizontal">
+                                <controls:SvgIcon Data="{StaticResource Svg.Check}" Width="16" Height="16" Foreground="White" Margin="0,0,8,0"/>
+                                <TextBlock Text="Save Role Permissions"/>
+                            </StackPanel>
+                        </Button>
+                    </Border>
                 </Grid>
             </TabItem>
 
             <!-- Security Audit Logs -->
             <TabItem Header="Audit Logs">
-                <DataGrid ItemsSource="{Binding AuditLogs}" AutoGenerateColumns="False" CanUserAddRows="False" Background="White">
+                <DataGrid ItemsSource="{Binding AuditLogs}" AutoGenerateColumns="False" CanUserAddRows="False" Background="White" Margin="0,8,0,0">
                     <DataGrid.RowStyle>
                         <Style TargetType="DataGridRow">
                             <Style.Triggers>
@@ -110,9 +149,9 @@
                         </Style>
                     </DataGrid.RowStyle>
                     <DataGrid.Columns>
-                        <DataGridTextColumn Header="Timestamp" Binding="{Binding TimestampUtc}" Width="150"/>
-                        <DataGridTextColumn Header="Event Type" Binding="{Binding EventType}" Width="150"/>
-                        <DataGridTextColumn Header="Severity" Binding="{Binding Severity}" Width="100"/>
+                        <DataGridTextColumn Header="Timestamp (UTC)" Binding="{Binding TimestampUtc, StringFormat='{}{0:yyyy-MM-dd HH:mm:ss}'}" Width="180"/>
+                        <DataGridTextColumn Header="Event Type" Binding="{Binding EventType}" Width="160"/>
+                        <DataGridTextColumn Header="Severity" Binding="{Binding Severity}" Width="120"/>
                         <DataGridTextColumn Header="Details" Binding="{Binding Details}" Width="*"/>
                     </DataGrid.Columns>
                 </DataGrid>

@@ -5,6 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:vm="clr-namespace:YAERP.UI.ViewModels"
         xmlns:views="clr-namespace:YAERP.UI.Views"
+        xmlns:viewsSec="clr-namespace:YAERP.UI.Views.Security"
+        xmlns:vmSec="clr-namespace:YAERP.UI.ViewModels.Security"
         xmlns:anim="clr-namespace:YAERP.UI.Animations"
         xmlns:controls="clr-namespace:YAERP.UI.Views.Controls"
         xmlns:uiControls="clr-namespace:YAERP.UI.Controls"
@@ -48,7 +50,10 @@
         <DataTemplate DataType="{x:Type vm:DeepFinancialsViewModel}">
             <views:DeepFinancialsView />
         </DataTemplate>
-        
+        <DataTemplate DataType="{x:Type vmSec:UserAndRolesViewModel}">
+            <viewsSec:UserAndRolesView />
+        </DataTemplate>
+
         <BooleanToVisibilityConverter x:Key="BoolToVis"/>
 
         <controls:WorkspaceDataTemplateSelector x:Key="WorkspaceDataTemplateSelector">
@@ -102,6 +107,11 @@
                     <views:DeepFinancialsView />
                 </DataTemplate>
             </controls:WorkspaceDataTemplateSelector.DeepFinancialsTemplate>
+            <controls:WorkspaceDataTemplateSelector.UserAndRolesTemplate>
+                <DataTemplate>
+                    <viewsSec:UserAndRolesView />
+                </DataTemplate>
+            </controls:WorkspaceDataTemplateSelector.UserAndRolesTemplate>
         </controls:WorkspaceDataTemplateSelector>
 
     </Window.Resources>
@@ -129,18 +139,21 @@
                 </StackPanel>
 
                 <!-- Navigation Links -->
-                <StackPanel DockPanel.Dock="Top">
-                    <Button Content="📊  Dashboard" Command="{Binding NavigateDashboardCommand}" Style="{StaticResource SidebarNavButton}"/>
-                    <Button Content="🏢  Warehouse &amp; WMS" Command="{Binding NavigateWarehouseManagementCommand}" Style="{StaticResource SidebarNavButton}"/>
-                    <Button Content="📦  Inventory &amp; Stock" Command="{Binding NavigateInventoryCommand}" Style="{StaticResource SidebarNavButton}"/>
-                    <Button Content="🛒  Sales &amp; CRM" Command="{Binding NavigateSalesCommand}" Style="{StaticResource SidebarNavButton}"/>
-                    <Button Content="📈  Deep Financials" Command="{Binding NavigateDeepFinancialsCommand}" Style="{StaticResource SidebarNavButton}"/>
-                    <Button Content="💰  Finance &amp; Ledger" Command="{Binding NavigateFinanceCommand}" Style="{StaticResource SidebarNavButton}"/>
-                    <Button Content="🖥️  POS Terminal" Command="{Binding NavigatePosCommand}" Style="{StaticResource SidebarNavButton}"/>
-                    <Button Content="🛡️  Approval Center" Command="{Binding NavigateApprovalCenterCommand}" Style="{StaticResource SidebarNavButton}"/>
-                    <Button Content="🏭  Manufacturing" Command="{Binding NavigateManufacturingCommand}" Style="{StaticResource SidebarNavButton}"/>
-                    <Button Content="🧩  Plugin Hub" Command="{Binding NavigatePluginHubCommand}" Style="{StaticResource SidebarNavButton}"/>
-                </StackPanel>
+                <ScrollViewer DockPanel.Dock="Top" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                    <StackPanel>
+                        <Button Content="📊  Dashboard" Command="{Binding NavigateDashboardCommand}" Style="{StaticResource SidebarNavButton}"/>
+                        <Button Content="🏢  Warehouse &amp; WMS" Command="{Binding NavigateWarehouseManagementCommand}" Style="{StaticResource SidebarNavButton}"/>
+                        <Button Content="📦  Inventory &amp; Stock" Command="{Binding NavigateInventoryCommand}" Style="{StaticResource SidebarNavButton}"/>
+                        <Button Content="🛒  Sales &amp; CRM" Command="{Binding NavigateSalesCommand}" Style="{StaticResource SidebarNavButton}"/>
+                        <Button Content="📈  Deep Financials" Command="{Binding NavigateDeepFinancialsCommand}" Style="{StaticResource SidebarNavButton}"/>
+                        <Button Content="💰  Finance &amp; Ledger" Command="{Binding NavigateFinanceCommand}" Style="{StaticResource SidebarNavButton}"/>
+                        <Button Content="🖥️  POS Terminal" Command="{Binding NavigatePosCommand}" Style="{StaticResource SidebarNavButton}"/>
+                        <Button Content="🛡️  Approval Center" Command="{Binding NavigateApprovalCenterCommand}" Style="{StaticResource SidebarNavButton}"/>
+                        <Button Content="🏭  Manufacturing" Command="{Binding NavigateManufacturingCommand}" Style="{StaticResource SidebarNavButton}"/>
+                        <Button Content="🔐  Security &amp; Roles" Command="{Binding NavigateUserAndRolesCommand}" Style="{StaticResource SidebarNavButton}"/>
+                        <Button Content="🧩  Plugin Hub" Command="{Binding NavigatePluginHubCommand}" Style="{StaticResource SidebarNavButton}"/>
+                    </StackPanel>
+                </ScrollViewer>
 
                 <!-- Footer Status -->
                 <Border DockPanel.Dock="Bottom" Margin="20" Padding="12" Background="#1E293B" CornerRadius="8">
@@ -199,13 +212,20 @@
                             </StackPanel>
                         </Border>
 
-                        <!-- Pending Outbox Queue Count Chip -->
-                        <Border Background="#F1F5F9" BorderBrush="{StaticResource BorderSubtleBrush}" BorderThickness="1" CornerRadius="12" Padding="10,4" Margin="0,0,10,0">
+                        <!-- Pending Outbox Queue Count Chip (Click to resolve conflicts) -->
+                        <Button Command="{Binding OpenConflictResolverCommand}" Background="#F1F5F9" BorderBrush="{StaticResource BorderSubtleBrush}" BorderThickness="1" Padding="10,4" Margin="0,0,10,0" Cursor="Hand" ToolTip="Open Sync Conflict Resolver">
+                            <Button.Template>
+                                <ControlTemplate TargetType="Button">
+                                    <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="12" Padding="{TemplateBinding Padding}">
+                                        <ContentPresenter/>
+                                    </Border>
+                                </ControlTemplate>
+                            </Button.Template>
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock Text="📦 " FontSize="11" VerticalAlignment="Center"/>
                                 <TextBlock Text="{Binding UnsyncedOutboxCount, StringFormat='{}{0} Outbox'}" Foreground="{StaticResource TextSecondaryBrush}" FontSize="12" FontWeight="SemiBold"/>
                             </StackPanel>
-                        </Border>
+                        </Button>
 
                         <!-- Manual Sync Now Button -->
                         <Button Command="{Binding ManualSyncNowCommand}" Padding="10,5" Background="#2563EB" Foreground="#FFFFFF" FontWeight="Bold" FontSize="11" BorderThickness="0" Margin="0,0,16,0" Cursor="Hand">
@@ -222,10 +242,15 @@
                             </Button.Style>
                         </Button>
 
-                        <TextBlock Text="System Administrator" VerticalAlignment="Center" Foreground="{StaticResource TextPrimaryBrush}" FontWeight="SemiBold" Margin="0,0,12,0"/>
-                        <Border Width="36" Height="36" CornerRadius="18" Background="{StaticResource PrimaryBrush}">
-                            <TextBlock Text="SA" Foreground="#FFFFFF" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        </Border>
+                        <!-- User Profile Avatar Pill -->
+                        <Button Command="{Binding OpenUserProfileDrawerCommand}" Background="Transparent" BorderThickness="0" Cursor="Hand" ToolTip="Open User Profile &amp; Preferences">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="System Administrator" VerticalAlignment="Center" Foreground="{StaticResource TextPrimaryBrush}" FontWeight="SemiBold" Margin="0,0,12,0"/>
+                                <Border Width="36" Height="36" CornerRadius="18" Background="{StaticResource PrimaryBrush}">
+                                    <TextBlock Text="SA" Foreground="#FFFFFF" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Border>
+                            </StackPanel>
+                        </Button>
                     </StackPanel>
                 </DockPanel>
             </Border>

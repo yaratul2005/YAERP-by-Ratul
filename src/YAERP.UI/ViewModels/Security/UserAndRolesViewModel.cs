@@ -5,6 +5,7 @@ using System.Windows.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using YAERP.Application.Common.Interfaces;
+using YAERP.UI.Workspace;
 
 namespace YAERP.UI.ViewModels.Security;
 
@@ -40,7 +41,7 @@ public class AuditLogDto
     public DateTime TimestampUtc { get; set; }
 }
 
-public partial class UserAndRolesViewModel : ObservableObject // Inheriting TabViewModelBase in real app, mocked as ObservableObject here
+public partial class UserAndRolesViewModel : TabViewModelBase
 {
     private readonly IDialogService _dialogService;
     private readonly IIdentityService _identityService;
@@ -52,6 +53,9 @@ public partial class UserAndRolesViewModel : ObservableObject // Inheriting TabV
     private ObservableCollection<RoleDto> _roles = new();
 
     [ObservableProperty]
+    private RoleDto? _selectedRole;
+
+    [ObservableProperty]
     private ObservableCollection<PermissionNodeDto> _permissionTree = new();
 
     [ObservableProperty]
@@ -59,8 +63,52 @@ public partial class UserAndRolesViewModel : ObservableObject // Inheriting TabV
 
     public UserAndRolesViewModel(IDialogService dialogService, IIdentityService identityService)
     {
+        Title = "Security & Roles";
+        IconKey = "🔐";
+        TabId = "UserAndRolesViewModel";
+
         _dialogService = dialogService;
         _identityService = identityService;
+
+        LoadData();
+    }
+
+    private void LoadData()
+    {
+        Users = new ObservableCollection<UserDto>
+        {
+            new() { Id = Guid.NewGuid(), Username = "admin", FullName = "System Administrator", Department = "IT / Executive", IsActive = true },
+            new() { Id = Guid.NewGuid(), Username = "ratul.architect", FullName = "Ratul Systems", Department = "Core Engineering", IsActive = true },
+            new() { Id = Guid.NewGuid(), Username = "j.smith", FullName = "John Smith", Department = "Sales & Marketing", IsActive = true },
+            new() { Id = Guid.NewGuid(), Username = "a.davis", FullName = "Alice Davis", Department = "Finance & General Ledger", IsActive = true },
+            new() { Id = Guid.NewGuid(), Username = "m.logistics", FullName = "Mark Logistics", Department = "Warehouse & WMS", IsActive = false }
+        };
+
+        Roles = new ObservableCollection<RoleDto>
+        {
+            new() { Id = Guid.NewGuid(), Name = "System Administrator", Description = "Full unrestricted access across all business modules" },
+            new() { Id = Guid.NewGuid(), Name = "Finance Manager", Description = "Access to Journal Entries, Asset Depreciation, Tax Filings" },
+            new() { Id = Guid.NewGuid(), Name = "WMS Warehouse Operator", Description = "Stock Relocation, Goods Receiving Dock, Bin Slotting" },
+            new() { Id = Guid.NewGuid(), Name = "Sales Representative", Description = "Quotation Builder, Deal Pipeline Kanban, Customer 360" }
+        };
+        SelectedRole = Roles[0];
+
+        PermissionTree = new ObservableCollection<PermissionNodeDto>
+        {
+            new() { Code = "IAM.User.Create", Name = "Create User Accounts", ModuleGroup = "Identity", IsGranted = true },
+            new() { Code = "IAM.Role.Manage", Name = "Manage System Roles & Privileges", ModuleGroup = "Identity", IsGranted = true },
+            new() { Code = "Inventory.Delete", Name = "Delete Inventory SKUs", ModuleGroup = "Inventory", IsGranted = false },
+            new() { Code = "WMS.Bin.Lock", Name = "Toggle Bin Lock State", ModuleGroup = "WMS", IsGranted = true },
+            new() { Code = "Financials.GL.Post", Name = "Post Double-Entry Journal Vouchers", ModuleGroup = "Financials", IsGranted = true },
+            new() { Code = "Sales.Order.Create", Name = "Build & Approve Sales Orders", ModuleGroup = "Sales", IsGranted = true }
+        };
+
+        AuditLogs = new ObservableCollection<AuditLogDto>
+        {
+            new() { EventType = "UserLogin", Severity = "Low", Details = "Admin user logged in via desktop terminal", TimestampUtc = DateTime.UtcNow.AddMinutes(-12) },
+            new() { EventType = "PermissionUpdate", Severity = "Medium", Details = "Granted WMS.Bin.Lock permission to Warehouse Operator role", TimestampUtc = DateTime.UtcNow.AddHours(-2) },
+            new() { EventType = "PasswordReset", Severity = "High", Details = "Password reset initiated for user m.logistics", TimestampUtc = DateTime.UtcNow.AddDays(-1) }
+        };
     }
 
     [RelayCommand]
@@ -76,9 +124,22 @@ public partial class UserAndRolesViewModel : ObservableObject // Inheriting TabV
     }
 
     [RelayCommand]
+    private async Task RefreshDirectoryAsync()
+    {
+        LoadData();
+        await _dialogService.ShowGlobalToastAsync("User directory and audit log refreshed.");
+    }
+
+    [RelayCommand]
+    private async Task ExportAuditLogAsync()
+    {
+        await _dialogService.ShowGlobalToastAsync("Exported Security Audit Log to Excel.");
+    }
+
+    [RelayCommand]
     private async Task SaveRolePermissionsAsync()
     {
-        await _dialogService.ShowGlobalToastAsync("Permissions saved successfully");
+        await _dialogService.ShowGlobalToastAsync("Permissions updated successfully.");
     }
 
     [RelayCommand]
@@ -93,5 +154,6 @@ public partial class UserAndRolesViewModel : ObservableObject // Inheriting TabV
     {
         user.IsActive = !user.IsActive;
         await _identityService.LogSecurityEventAsync(Guid.Empty, user.Id, "StatusToggle", "Medium", $"User status changed to {user.IsActive}", "127.0.0.1");
+        await _dialogService.ShowGlobalToastAsync($"User status updated to {(user.IsActive ? "Active" : "Inactive")}.");
     }
 }

@@ -1,6 +1,7 @@
 using System.Windows;
 using System.Windows.Controls;
 using YAERP.UI.ViewModels;
+using YAERP.UI.ViewModels.Security;
 using YAERP.UI.Workspace;
 
 namespace YAERP.UI.Views.Controls;
@@ -17,6 +18,7 @@ public class WorkspaceDataTemplateSelector : DataTemplateSelector
     public DataTemplate? ManufacturingTemplate { get; set; }
     public DataTemplate? WarehouseManagementTemplate { get; set; }
     public DataTemplate? DeepFinancialsTemplate { get; set; }
+    public DataTemplate? UserAndRolesTemplate { get; set; }
 
     public override DataTemplate SelectTemplate(object item, DependencyObject container)
     {
@@ -32,6 +34,7 @@ public class WorkspaceDataTemplateSelector : DataTemplateSelector
             ManufacturingViewModel => ManufacturingTemplate,
             WarehouseManagementViewModel => WarehouseManagementTemplate,
             DeepFinancialsViewModel => DeepFinancialsTemplate,
+            UserAndRolesViewModel => UserAndRolesTemplate,
             _ => base.SelectTemplate(item, container)
         } ?? base.SelectTemplate(item, container);
     }

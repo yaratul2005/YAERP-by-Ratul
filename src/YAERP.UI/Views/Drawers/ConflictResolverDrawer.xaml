@@ -19,18 +19,18 @@
                 <DataTemplate>
                     <StackPanel Margin="8">
                         <TextBlock Text="{Binding EntityType}" FontWeight="SemiBold"/>
-                        <TextBlock Text="{Binding DetectedAt}" Foreground="#64748B" FontSize="11"/>
+                        <TextBlock Text="{Binding DetectedAt, StringFormat='{}{0:HH:mm:ss UTC}'}" Foreground="#64748B" FontSize="11"/>
                     </StackPanel>
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
 
-        <StackPanel Grid.Row="2" Visibility="{Binding SelectedConflict, Converter={StaticResource NullToCollapsedConverter}}">
+        <StackPanel Grid.Row="2">
             <TextBlock Text="Local State:" FontWeight="SemiBold"/>
-            <TextBox Text="{Binding SelectedConflict.LocalPayload}" IsReadOnly="True" TextWrapping="Wrap" Margin="0,0,0,12" Padding="8" Background="#F1F5F9" MaxHeight="100"/>
+            <TextBox Text="{Binding SelectedConflict.LocalPayload}" IsReadOnly="True" TextWrapping="Wrap" Margin="0,4,0,12" Padding="8" Background="#F1F5F9" MaxHeight="100"/>
 
             <TextBlock Text="Remote Cloud State:" FontWeight="SemiBold"/>
-            <TextBox Text="{Binding SelectedConflict.RemotePayload}" IsReadOnly="True" TextWrapping="Wrap" Margin="0,0,0,16" Padding="8" Background="#FEF2F2" MaxHeight="100"/>
+            <TextBox Text="{Binding SelectedConflict.RemotePayload}" IsReadOnly="True" TextWrapping="Wrap" Margin="0,4,0,16" Padding="8" Background="#FEF2F2" MaxHeight="100"/>
 
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                 <Button Command="{Binding KeepLocalVersionCommand}" Content="Keep Local" Style="{DynamicResource PrimaryButtonStyle}" Margin="0,0,8,0"/>

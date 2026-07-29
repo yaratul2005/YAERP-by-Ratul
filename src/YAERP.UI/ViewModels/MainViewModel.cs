@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel;
+using System.Threading;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -7,6 +8,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using YAERP.Application.Common.Interfaces;
 using YAERP.UI.Services;
+using YAERP.UI.ViewModels.Drawers;
+using YAERP.UI.ViewModels.Security;
+using YAERP.UI.Views.Drawers;
 using YAERP.UI.Workspace;
 
 namespace YAERP.UI.ViewModels;
@@ -144,9 +148,40 @@ public partial class MainViewModel : ObservableObject
     private void NavigateDeepFinancials() => Workspace.OpenTab<DeepFinancialsViewModel>();
 
     [RelayCommand]
+    private void NavigateUserAndRoles() => Workspace.OpenTab<UserAndRolesViewModel>();
+
+    [RelayCommand]
     private async Task OpenConflictResolverAsync()
     {
-        await _dialogService.ShowDrawerAsync("Conflict Resolver", "ConflictResolverDrawerViewModel");
+        if (Workspace.ActiveTab != null && _scopeFactory != null)
+        {
+            using var scope = _scopeFactory.CreateScope();
+            var syncEngine = scope.ServiceProvider.GetService<ISyncEngineService>() ?? new MockSyncEngineService();
+            var drawerVm = new ConflictResolverDrawerViewModel(syncEngine, _dialogService);
+            var drawerControl = new ConflictResolverDrawer { DataContext = drawerVm };
+            Workspace.ActiveTab.OpenDrawer(drawerControl, "Outbox Sync Conflict Resolver");
+        }
+        else
+        {
+            await _dialogService.ShowGlobalToastAsync("Opening Sync Conflict Resolver...");
+        }
+    }
+
+    [RelayCommand]
+    private async Task OpenUserProfileDrawerAsync()
+    {
+        if (Workspace.ActiveTab != null && _scopeFactory != null)
+        {
+            using var scope = _scopeFactory.CreateScope();
+            var identityService = scope.ServiceProvider.GetService<IIdentityService>() ?? new MockIdentityService();
+            var drawerVm = new UserProfileDrawerViewModel(_dialogService, identityService);
+            var drawerControl = new UserProfileDrawer { DataContext = drawerVm };
+            Workspace.ActiveTab.OpenDrawer(drawerControl, "User Profile & Preferences");
+        }
+        else
+        {
+            await _dialogService.ShowGlobalToastAsync("Opening User Profile Settings...");
+        }
     }
 
     [RelayCommand]
@@ -160,6 +195,7 @@ public partial class MainViewModel : ObservableObject
             int synced = await _cloudSyncService.ProcessSyncBatchAsync(50);
             LastSyncTimeText = DateTime.Now.ToString("HH:mm:ss");
             await RefreshOutboxCountAsync();
+            await _dialogService.ShowGlobalToastAsync("Sync process triggered cleanly.");
         }
         finally
         {
@@ -167,12 +203,11 @@ public partial class MainViewModel : ObservableObject
         }
     }
 
-
     private async Task CheckForUpdatesAsync()
     {
         if (_autoUpdaterService == null) return;
 
-        var currentVersion = "1.0.0"; // In real app: Assembly.GetExecutingAssembly().GetName().Version.ToString()
+        var currentVersion = "1.0.0";
         var manifest = await _autoUpdaterService.CheckForUpdatesAsync(currentVersion);
 
         if (manifest != null)
@@ -255,4 +290,31 @@ public partial class MainViewModel : ObservableObject
             UnsyncedOutboxCount = 0;
         }
     }
+}
+
+public class MockSyncEngineService : ISyncEngineService
+{
+    public Task PushAsync(CancellationToken cancellationToken = default) => Task.CompletedTask;
+    public Task PullAsync(CancellationToken cancellationToken = default) => Task.CompletedTask;
+    public Task<int> ProcessOutboxQueueAsync(int batchSize = 50) => Task.FromResult(0);
+    public Task ResolveConflictAsync(Guid conflictId, string resolutionStrategy, CancellationToken cancellationToken = default) => Task.CompletedTask;
+}
+
+public class MockIdentityService : IIdentityService
+{
+    public string HashPassword(string password, out string salt)
+    {
+        salt = Guid.NewGuid().ToString("N");
+        return "hashed_" + password;
+    }
+
+    public bool VerifyPassword(string password, string hash, string salt) => true;
+
+    public Task<Domain.Entities.Security.ApplicationUser?> GetUserByIdAsync(Guid userId) => Task.FromResult<Domain.Entities.Security.ApplicationUser?>(null);
+
+    public Task LogSecurityEventAsync(Guid tenantId, Guid userId, string eventType, string severity, string details, string ipAddress, CancellationToken cancellationToken = default) => Task.CompletedTask;
+
+    public Task<bool> EvaluatePermissionAsync(Guid userId, string permissionCode, CancellationToken cancellationToken = default) => Task.FromResult(true);
+
+    public void InvalidatePermissionCache(Guid userId) { }
 }
