@@ -10,7 +10,7 @@ namespace YAERP.UI.ViewModels;
 public partial class DashboardViewModel : TabViewModelBase
 {
     private readonly IMediator _mediator;
-    private readonly INavigationService? _navigationService;
+    private readonly ITabWorkspaceService? _workspace;
 
     [ObservableProperty]
     private bool _isBusy;
@@ -33,13 +33,13 @@ public partial class DashboardViewModel : TabViewModelBase
     [ObservableProperty]
     private bool _hasAiAlerts;
 
-    public DashboardViewModel(IMediator mediator, INavigationService? navigationService = null)
+    public DashboardViewModel(IMediator mediator, ITabWorkspaceService? workspace = null)
     {
         Title = "Dashboard";
         IconKey = "📊";
         TabId = "DashboardViewModel";
         _mediator = mediator;
-        _navigationService = navigationService;
+        _workspace = workspace;
     }
 
     public override async Task OnTabActivatedAsync()
@@ -75,12 +75,12 @@ public partial class DashboardViewModel : TabViewModelBase
     [RelayCommand]
     private void NavigateToInventory()
     {
-        _navigationService?.NavigateTo<InventoryViewModel>();
+        _workspace?.OpenTab<InventoryViewModel>();
     }
 
     [RelayCommand]
     private void NavigateToFinance()
     {
-        _navigationService?.NavigateTo<FinanceViewModel>();
+        _workspace?.OpenTab<FinanceViewModel>();
     }
 }
