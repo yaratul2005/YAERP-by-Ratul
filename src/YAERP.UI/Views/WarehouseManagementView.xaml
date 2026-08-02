@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:controls="clr-namespace:YAERP.UI.Controls"
+             xmlns:viewControls="clr-namespace:YAERP.UI.Views.Controls"
              mc:Ignorable="d"
              d:DesignHeight="800" d:DesignWidth="1200"
              Background="#F8FAFC">
@@ -62,7 +63,19 @@
             <!-- Spatial Bin Matrix Tab -->
             <TabItem Header="🏢 Spatial Bin Matrix">
                 <Grid Margin="16">
-                    <DataGrid ItemsSource="{Binding SpatialBins}" SelectedItem="{Binding SelectedBin}" AutoGenerateColumns="False" CanUserAddRows="False"
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    
+                    <!-- Interactive 2D Visual Bin Map Grid -->
+                    <Border Grid.Row="0" Margin="0,0,0,16" Background="White" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="8" Padding="12">
+                        <DockPanel>
+                            <TextBlock Text="🗺️ Visual Warehouse Slotting &amp; Heatmap Grid" DockPanel.Dock="Top" FontSize="15" FontWeight="Bold" Foreground="#0F172A" Margin="0,0,0,8"/>
+                            <viewControls:SpatialBinGridControl />
+                        </DockPanel>
+                    </Border>
+                    <DataGrid Grid.Row="1" ItemsSource="{Binding SpatialBins}" SelectedItem="{Binding SelectedBin}" AutoGenerateColumns="False" CanUserAddRows="False"
                                GridLinesVisibility="Horizontal" BorderBrush="#E2E8F0" HeadersVisibility="Column" RowHeight="44">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Bin Code" Binding="{Binding BinCode}" Width="200" FontWeight="Bold"/>

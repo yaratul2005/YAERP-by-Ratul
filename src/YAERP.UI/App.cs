@@ -73,6 +73,7 @@ public partial class App : System.Windows.Application
                     services.AddSingleton<IDialogService, DialogService>();
                     services.AddSingleton<ITabWorkspaceService, TabWorkspaceService>();
                     services.AddSingleton<ICommandPaletteService, CommandPaletteService>();
+                    services.AddSingleton<IThemeService, ThemeService>();
                     services.AddSingleton<MainWindow>();
 
                     // Register ViewModels
