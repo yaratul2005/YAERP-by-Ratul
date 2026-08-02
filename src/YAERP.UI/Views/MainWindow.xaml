@@ -7,6 +7,8 @@
         xmlns:views="clr-namespace:YAERP.UI.Views"
         xmlns:viewsSec="clr-namespace:YAERP.UI.Views.Security"
         xmlns:vmSec="clr-namespace:YAERP.UI.ViewModels.Security"
+        xmlns:vmModals="clr-namespace:YAERP.UI.ViewModels.Modals"
+        xmlns:viewsModals="clr-namespace:YAERP.UI.Views.Modals"
         xmlns:anim="clr-namespace:YAERP.UI.Animations"
         xmlns:controls="clr-namespace:YAERP.UI.Views.Controls"
         xmlns:uiControls="clr-namespace:YAERP.UI.Controls"
@@ -19,6 +21,7 @@
         <KeyBinding Gesture="CTRL+K" Command="{Binding ToggleCommandPaletteCommand}"/>
         <KeyBinding Gesture="F1" Command="{Binding ToggleCommandPaletteCommand}"/>
     </Window.InputBindings>
+
     <Window.Resources>
         <DataTemplate DataType="{x:Type vm:DashboardViewModel}">
             <views:DashboardView />
@@ -55,6 +58,12 @@
         </DataTemplate>
         <DataTemplate DataType="{x:Type vm:SystemSettingsViewModel}">
             <views:SystemSettingsView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vmModals:GoogleSheetsExportModalViewModel}">
+            <viewsModals:GoogleSheetsExportModal />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vmModals:GoogleDrivePickerModalViewModel}">
+            <viewsModals:GoogleDrivePickerModal />
         </DataTemplate>
 
         <BooleanToVisibilityConverter x:Key="BoolToVis"/>
