@@ -19,6 +19,7 @@ public class WorkspaceDataTemplateSelector : DataTemplateSelector
     public DataTemplate? WarehouseManagementTemplate { get; set; }
     public DataTemplate? DeepFinancialsTemplate { get; set; }
     public DataTemplate? UserAndRolesTemplate { get; set; }
+    public DataTemplate? SystemSettingsTemplate { get; set; }
 
     public override DataTemplate SelectTemplate(object item, DependencyObject container)
     {
@@ -35,6 +36,7 @@ public class WorkspaceDataTemplateSelector : DataTemplateSelector
             WarehouseManagementViewModel => WarehouseManagementTemplate,
             DeepFinancialsViewModel => DeepFinancialsTemplate,
             UserAndRolesViewModel => UserAndRolesTemplate,
+            SystemSettingsViewModel => SystemSettingsTemplate,
             _ => base.SelectTemplate(item, container)
         } ?? base.SelectTemplate(item, container);
     }

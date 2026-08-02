@@ -123,6 +123,7 @@ public partial class MainViewModel : ObservableObject
         _commandPaletteService.RegisterCommand(new PaletteCommandItem("Manufacturing & MRP II", "Multi-level BOM tree & production logs", "Navigation", "⚙️", NavigateManufacturingCommand));
         _commandPaletteService.RegisterCommand(new PaletteCommandItem("Security & Roles (IAM)", "User accounts, roles & security audit trail", "Navigation", "🔐", NavigateUserAndRolesCommand));
         _commandPaletteService.RegisterCommand(new PaletteCommandItem("Plugin Management Hub", "Inspect isolated AssemblyLoadContext sandboxes", "Navigation", "🧩", NavigatePluginHubCommand));
+        _commandPaletteService.RegisterCommand(new PaletteCommandItem("System Settings & MongoDB Interop", "MongoDB auto-setup, AES-256 encryption & static-to-dynamic database loader", "System", "⚙️", NavigateSystemSettingsCommand));
         _commandPaletteService.RegisterCommand(new PaletteCommandItem("Trigger Manual Cloud Sync", "Process local outbox queue to cloud", "Sync", "🔄", ManualSyncNowCommand));
         _commandPaletteService.RegisterCommand(new PaletteCommandItem("Open Outbox Conflict Resolver", "Inspect and resolve sync version conflicts", "Sync", "📦", OpenConflictResolverCommand));
         _commandPaletteService.RegisterCommand(new PaletteCommandItem("Open User Profile Settings", "Update password and UI preferences", "System", "👤", OpenUserProfileDrawerCommand));
@@ -175,6 +176,9 @@ public partial class MainViewModel : ObservableObject
 
     [RelayCommand]
     private void NavigateUserAndRoles() => Workspace.OpenTab<UserAndRolesViewModel>();
+
+    [RelayCommand]
+    private void NavigateSystemSettings() => Workspace.OpenTab<SystemSettingsViewModel>();
 
     [RelayCommand]
     private async Task OpenConflictResolverAsync()

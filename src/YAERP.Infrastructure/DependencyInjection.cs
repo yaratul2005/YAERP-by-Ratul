@@ -61,6 +61,7 @@ public static class DependencyInjection
         services.AddSingleton<IHmacValidator, HmacValidator>();
         services.AddSingleton<IPluginManager, PluginManager>();
         services.AddSingleton<IIdentityService, IdentityService>();
+        services.AddSingleton<IMongoDbSyncService, MongoDbSyncService>();
 
         services.AddScoped<IInventoryForecastingService, InventoryForecastingService>();
         services.AddScoped<IApprovalWorkflowService, ApprovalWorkflowService>();

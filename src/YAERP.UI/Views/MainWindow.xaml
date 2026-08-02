@@ -53,6 +53,9 @@
         <DataTemplate DataType="{x:Type vmSec:UserAndRolesViewModel}">
             <viewsSec:UserAndRolesView />
         </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:SystemSettingsViewModel}">
+            <views:SystemSettingsView />
+        </DataTemplate>
 
         <BooleanToVisibilityConverter x:Key="BoolToVis"/>
 
@@ -112,6 +115,11 @@
                     <viewsSec:UserAndRolesView />
                 </DataTemplate>
             </controls:WorkspaceDataTemplateSelector.UserAndRolesTemplate>
+            <controls:WorkspaceDataTemplateSelector.SystemSettingsTemplate>
+                <DataTemplate>
+                    <views:SystemSettingsView />
+                </DataTemplate>
+            </controls:WorkspaceDataTemplateSelector.SystemSettingsTemplate>
         </controls:WorkspaceDataTemplateSelector>
 
     </Window.Resources>
@@ -152,6 +160,7 @@
                         <Button Content="🏭  Manufacturing" Command="{Binding NavigateManufacturingCommand}" Style="{StaticResource SidebarNavButton}"/>
                         <Button Content="🔐  Security &amp; Roles" Command="{Binding NavigateUserAndRolesCommand}" Style="{StaticResource SidebarNavButton}"/>
                         <Button Content="🧩  Plugin Hub" Command="{Binding NavigatePluginHubCommand}" Style="{StaticResource SidebarNavButton}"/>
+                        <Button Content="⚙️  System Settings" Command="{Binding NavigateSystemSettingsCommand}" Style="{StaticResource SidebarNavButton}"/>
                     </StackPanel>
                 </ScrollViewer>
 

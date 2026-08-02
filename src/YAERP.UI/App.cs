@@ -88,6 +88,7 @@ public partial class App : System.Windows.Application
                     services.AddTransient<WarehouseManagementViewModel>();
                     services.AddTransient<DeepFinancialsViewModel>();
                     services.AddTransient<UserAndRolesViewModel>();
+                    services.AddTransient<SystemSettingsViewModel>();
                 })
                 .Build();
         }

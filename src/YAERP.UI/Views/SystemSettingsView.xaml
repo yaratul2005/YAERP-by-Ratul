@@ -1,0 +1,178 @@
+<UserControl x:Class="YAERP.UI.Views.SystemSettingsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:controls="clr-namespace:YAERP.UI.Controls"
+             mc:Ignorable="d"
+             d:DesignHeight="800" d:DesignWidth="1200"
+             Background="#F8FAFC">
+
+    <Grid Margin="24">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header Bar & Status Pill -->
+        <DockPanel Grid.Row="0" Margin="0,0,0,24">
+            <StackPanel DockPanel.Dock="Left">
+                <TextBlock Text="System Settings &amp; MongoDB Interop Hub" FontSize="24" FontWeight="Bold" Foreground="#0F172A"/>
+                <TextBlock Text="Auto-setup MongoDB static/dynamic database, AES-256 field encryption &amp; real-time change stream adoption" FontSize="14" Foreground="#64748B"/>
+            </StackPanel>
+
+            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                <!-- Connection Status Badge -->
+                <Border CornerRadius="12" Padding="12,6" Margin="0,0,12,0">
+                    <Border.Style>
+                        <Style TargetType="Border">
+                            <Setter Property="Background" Value="#FEF3C7"/>
+                            <Setter Property="BorderBrush" Value="#FDE68A"/>
+                            <Setter Property="BorderThickness" Value="1"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsConnected}" Value="True">
+                                    <Setter Property="Background" Value="#DCFCE7"/>
+                                    <Setter Property="BorderBrush" Value="#86EFAC"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Border.Style>
+                    <TextBlock Text="{Binding ConnectionStatusText}" FontSize="13" FontWeight="Bold">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Foreground" Value="#B45309"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsConnected}" Value="True">
+                                        <Setter Property="Foreground" Value="#15803D"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                </Border>
+
+                <Button Command="{Binding SaveSettingsCommand}" Padding="14,8" Background="#2563EB" Foreground="White" FontWeight="Bold" BorderThickness="0" Cursor="Hand">
+                    <StackPanel Orientation="Horizontal">
+                        <controls:SvgIcon Data="{StaticResource Svg.Check}" Width="16" Height="16" Foreground="White" Margin="0,0,6,0"/>
+                        <TextBlock Text="Save Settings" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Button>
+            </StackPanel>
+        </DockPanel>
+
+        <!-- Main Content Area: 2 Columns -->
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1.2*"/>
+                <ColumnDefinition Width="16"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Left Card: MongoDB Connection & Encryption Auto-Setup -->
+            <Border Grid.Column="0" Background="White" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="8" Padding="20">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel>
+                        <TextBlock Text="🍃 MongoDB Auto-Setup &amp; Connection Tool" FontSize="16" FontWeight="Bold" Foreground="#0F172A" Margin="0,0,0,16"/>
+
+                        <!-- Connection String Input -->
+                        <TextBlock Text="MongoDB Connection String (URI):" FontSize="12" FontWeight="Bold" Foreground="#475569" Margin="0,0,0,4"/>
+                        <TextBox Text="{Binding ConnectionString, UpdateSourceTrigger=PropertyChanged}" Padding="10" FontSize="13" Background="#F8FAFC" BorderBrush="#CBD5E1" BorderThickness="1" Margin="0,0,0,14"/>
+
+                        <!-- Database Name Input -->
+                        <TextBlock Text="Target Database Name:" FontSize="12" FontWeight="Bold" Foreground="#475569" Margin="0,0,0,4"/>
+                        <TextBox Text="{Binding DatabaseName, UpdateSourceTrigger=PropertyChanged}" Padding="10" FontSize="13" Background="#F8FAFC" BorderBrush="#CBD5E1" BorderThickness="1" Margin="0,0,0,16"/>
+
+                        <!-- Connection Action Buttons -->
+                        <Grid Margin="0,0,0,20">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="10"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <Button Grid.Column="0" Command="{Binding TestConnectionCommand}" Height="40" Background="#F1F5F9" Foreground="#1E293B" FontWeight="Bold" BorderThickness="0" Cursor="Hand">
+                                <StackPanel Orientation="Horizontal">
+                                    <controls:SvgIcon Data="{StaticResource Svg.Refresh}" Width="16" Height="16" Foreground="#1E293B" Margin="0,0,6,0"/>
+                                    <TextBlock Text="Test Connection" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Button>
+
+                            <Button Grid.Column="2" Command="{Binding AutoSetupMongoDbCommand}" Height="40" Background="#059669" Foreground="White" FontWeight="Bold" BorderThickness="0" Cursor="Hand">
+                                <StackPanel Orientation="Horizontal">
+                                    <controls:SvgIcon Data="{StaticResource Svg.Plus}" Width="16" Height="16" Foreground="White" Margin="0,0,6,0"/>
+                                    <TextBlock Text="Auto-Setup Database" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Button>
+                        </Grid>
+
+                        <Separator Background="#E2E8F0" Margin="0,0,0,20"/>
+
+                        <!-- AES-256 Field Encryption Settings -->
+                        <TextBlock Text="🔐 Field-Level Encryption &amp; Security" FontSize="16" FontWeight="Bold" Foreground="#0F172A" Margin="0,0,0,14"/>
+
+                        <CheckBox IsChecked="{Binding EnableEncryption}" Content="Enable AES-256 Payload Encryption before storing to MongoDB" FontWeight="SemiBold" FontSize="13" Margin="0,0,0,12"/>
+
+                        <TextBlock Text="Encryption Master Key:" FontSize="12" FontWeight="Bold" Foreground="#475569" Margin="0,0,0,4"/>
+                        <TextBox Text="{Binding EncryptionKey, UpdateSourceTrigger=PropertyChanged}" Padding="10" FontSize="13" FontFamily="Consolas" Background="#F8FAFC" BorderBrush="#CBD5E1" BorderThickness="1" Margin="0,0,0,16"/>
+
+                        <Separator Background="#E2E8F0" Margin="0,0,0,20"/>
+
+                        <!-- Dynamic Real-Time Record Adoption Toggle -->
+                        <TextBlock Text="⚡ Dynamic Record Auto-Detection" FontSize="16" FontWeight="Bold" Foreground="#0F172A" Margin="0,0,0,14"/>
+
+                        <CheckBox IsChecked="{Binding AutoSyncDynamicChanges}" Content="Automatically detect record changes and adopt static-to-dynamic schema mutations" FontWeight="SemiBold" FontSize="13" Margin="0,0,0,16"/>
+
+                        <Button Command="{Binding SyncStaticToDynamicNowCommand}" Height="40" Background="#2563EB" Foreground="White" FontWeight="Bold" BorderThickness="0" Cursor="Hand">
+                            <StackPanel Orientation="Horizontal">
+                                <controls:SvgIcon Data="{StaticResource Svg.Transfer}" Width="16" Height="16" Foreground="White" Margin="0,0,6,0"/>
+                                <TextBlock Text="Run Static-to-Dynamic Loader Now" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+                </ScrollViewer>
+            </Border>
+
+            <!-- Right Column: Loader Adoption Summary & Activity Console -->
+            <Grid Grid.Column="2">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="16"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <!-- Adoption Summary Card -->
+                <Border Grid.Row="0" Background="White" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="8" Padding="20">
+                    <StackPanel>
+                        <TextBlock Text="📊 Static to Dynamic Loader Analytics" FontSize="16" FontWeight="Bold" Foreground="#0F172A" Margin="0,0,0,14"/>
+
+                        <Border Background="#EFF6FF" BorderBrush="#93C5FD" BorderThickness="1" CornerRadius="8" Padding="14">
+                            <DockPanel>
+                                <StackPanel DockPanel.Dock="Left">
+                                    <TextBlock Text="Total Master Records Adopted:" FontSize="12" Foreground="#1E40AF" FontWeight="SemiBold"/>
+                                    <TextBlock Text="{Binding TotalRecordsSynced, StringFormat='{}{0:N0} Records'}" FontSize="22" FontWeight="Bold" Foreground="#1E3A8A" Margin="0,4,0,0"/>
+                                </StackPanel>
+                                <Border Background="#DBEAFE" CornerRadius="12" Padding="10,4" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                    <TextBlock Text="● Live Watcher Active" FontSize="11" FontWeight="Bold" Foreground="#1E40AF"/>
+                                </Border>
+                            </DockPanel>
+                        </Border>
+                    </StackPanel>
+                </Border>
+
+                <!-- Real-Time Activity Log Console Card -->
+                <Border Grid.Row="2" Background="White" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="8" Padding="20">
+                    <DockPanel>
+                        <DockPanel DockPanel.Dock="Top" Margin="0,0,0,12">
+                            <TextBlock Text="🖥️ Dynamic Sync Console &amp; Stream Log" FontSize="16" FontWeight="Bold" Foreground="#0F172A"/>
+                            <Button Command="{Binding ClearLogsCommand}" Content="Clear Console" Padding="8,4" Background="#F1F5F9" Foreground="#475569" FontWeight="Bold" FontSize="11" BorderThickness="0" HorizontalAlignment="Right" Cursor="Hand"/>
+                        </DockPanel>
+
+                        <Border Background="#0F172A" CornerRadius="6" Padding="12">
+                            <ListBox ItemsSource="{Binding ActivityLogs}" Background="Transparent" BorderThickness="0" Foreground="#38BDF8" FontFamily="Consolas" FontSize="12"/>
+                        </Border>
+                    </DockPanel>
+                </Border>
+            </Grid>
+        </Grid>
+    </Grid>
+</UserControl>
