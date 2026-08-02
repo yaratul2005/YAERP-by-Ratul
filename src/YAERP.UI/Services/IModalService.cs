@@ -9,5 +9,6 @@ public interface IModalService
     string ModalTitle { get; }
     ObservableObject? CurrentModalContent { get; }
     void OpenModal<TViewModel>(string title) where TViewModel : ObservableObject;
+    void OpenModal(string title, ObservableObject contentViewModel);
     void CloseModal();
 }

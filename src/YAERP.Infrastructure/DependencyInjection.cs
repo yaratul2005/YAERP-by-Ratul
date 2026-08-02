@@ -10,6 +10,7 @@ using YAERP.Application.Common.Plugins;
 using YAERP.Application.Common.Security;
 using YAERP.Infrastructure.Persistence;
 using YAERP.Infrastructure.Persistence.Interceptors;
+using YAERP.Infrastructure.Services.Google;
 using YAERP.Infrastructure.Reporting;
 using YAERP.Infrastructure.AI.Services;
 using YAERP.Infrastructure.Hardware.Services;
@@ -62,6 +63,9 @@ public static class DependencyInjection
         services.AddSingleton<IPluginManager, PluginManager>();
         services.AddSingleton<IIdentityService, IdentityService>();
         services.AddSingleton<IMongoDbSyncService, MongoDbSyncService>();
+        services.AddSingleton<IGoogleAuthService, GoogleAuthService>();
+        services.AddSingleton<IGoogleDriveService, GoogleDriveService>();
+        services.AddSingleton<IGoogleSheetsService, GoogleSheetsService>();
 
         services.AddScoped<IInventoryForecastingService, InventoryForecastingService>();
         services.AddScoped<IApprovalWorkflowService, ApprovalWorkflowService>();

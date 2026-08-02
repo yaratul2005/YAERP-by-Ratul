@@ -29,6 +29,10 @@
     <PackageReference Include="Microsoft.ML" />
     <PackageReference Include="Microsoft.ML.TimeSeries" />
     <PackageReference Include="MongoDB.Driver" />
+    <PackageReference Include="Google.Apis.Drive.v3" />
+    <PackageReference Include="Google.Apis.Sheets.v4" />
+    <PackageReference Include="Google.Apis.Auth" />
+    <PackageReference Include="System.Security.Cryptography.ProtectedData" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
     <PackageReference Include="QuestPDF" />
   </ItemGroup>

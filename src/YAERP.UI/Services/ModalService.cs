@@ -41,6 +41,13 @@ public class ModalService : ObservableObject, IModalService
         IsModalOpen = true;
     }
 
+    public void OpenModal(string title, ObservableObject contentViewModel)
+    {
+        ModalTitle = title;
+        CurrentModalContent = contentViewModel;
+        IsModalOpen = true;
+    }
+
     public void CloseModal()
     {
         IsModalOpen = false;
