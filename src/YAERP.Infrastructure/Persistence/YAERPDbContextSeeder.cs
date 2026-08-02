@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.Logging;
 using YAERP.Application.Common.Interfaces;
 using YAERP.Domain.Identity;
@@ -34,6 +35,16 @@ public class YAERPDbContextSeeder : IDatabaseSeeder
             // Note: Migrations are provider-specific. Since we use two providers, we'd need multiple migration sets.
             // Using EnsureCreatedAsync for this boilerplate to easily bootstrap schema regardless of connection.
             await _context.Database.EnsureCreatedAsync(cancellationToken);
+
+            try
+            {
+                var creator = _context.Database.GetService<Microsoft.EntityFrameworkCore.Storage.IRelationalDatabaseCreator>();
+                creator.CreateTables();
+            }
+            catch
+            {
+                // Tables already created or created via EnsureCreated
+            }
 
             // Seed Default Tenant
             var defaultTenant = await _context.Tenants.IgnoreQueryFilters().FirstOrDefaultAsync(t => t.Name == "Default System Tenant", cancellationToken);

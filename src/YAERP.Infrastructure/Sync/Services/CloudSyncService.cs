@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -60,11 +61,29 @@ public class CloudSyncService : ICloudSyncService
         using var scope = _scopeFactory.CreateScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<IApplicationDbContext>();
 
-        var unSyncedItems = await dbContext.SyncQueueItems
-            .Where(x => !x.IsSynced)
-            .OrderBy(x => x.CreatedAtUtc)
-            .Take(batchSize)
-            .ToListAsync(cancellationToken);
+        List<YAERP.Domain.Entities.SyncQueueItem> unSyncedItems;
+        try
+        {
+            unSyncedItems = await dbContext.SyncQueueItems
+                .Where(x => !x.IsSynced)
+                .OrderBy(x => x.CreatedAtUtc)
+                .Take(batchSize)
+                .ToListAsync(cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "SyncQueueItems query failed. Triggering automatic database table auto-healing.");
+            if (dbContext is DbContext efDbContext)
+            {
+                try
+                {
+                    var creator = efDbContext.Database.GetService<Microsoft.EntityFrameworkCore.Storage.IRelationalDatabaseCreator>();
+                    creator.CreateTables();
+                }
+                catch { }
+            }
+            return 0;
+        }
 
         if (unSyncedItems.Count == 0)
         {
