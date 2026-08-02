@@ -74,9 +74,9 @@
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                        <Button Command="{Binding DataContext.ResetPasswordCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                        <Button Command="{Binding DataContext.ResetPasswordCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                 CommandParameter="{Binding Id}" Content="Reset Pwd" Style="{DynamicResource GhostButtonStyle}" Margin="0,0,8,0"/>
-                                        <Button Command="{Binding DataContext.ToggleUserStatusCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                        <Button Command="{Binding DataContext.ToggleUserStatusCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                 CommandParameter="{Binding .}" Content="Toggle Status" Style="{DynamicResource GhostButtonStyle}"/>
                                     </StackPanel>
                                 </DataTemplate>

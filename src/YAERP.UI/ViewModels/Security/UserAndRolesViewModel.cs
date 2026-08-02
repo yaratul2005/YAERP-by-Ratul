@@ -9,28 +9,32 @@ using YAERP.UI.Workspace;
 
 namespace YAERP.UI.ViewModels.Security;
 
-public class UserDto
+public partial class UserDto : ObservableObject
 {
     public Guid Id { get; set; }
     public string Username { get; set; } = string.Empty;
     public string FullName { get; set; } = string.Empty;
     public string Department { get; set; } = string.Empty;
-    public bool IsActive { get; set; }
+
+    [ObservableProperty]
+    private bool _isActive;
 }
 
-public class RoleDto
+public partial class RoleDto : ObservableObject
 {
     public Guid Id { get; set; }
     public string Name { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
 }
 
-public class PermissionNodeDto
+public partial class PermissionNodeDto : ObservableObject
 {
     public string Code { get; set; } = string.Empty;
     public string Name { get; set; } = string.Empty;
     public string ModuleGroup { get; set; } = string.Empty;
-    public bool IsGranted { get; set; }
+
+    [ObservableProperty]
+    private bool _isGranted;
 }
 
 public class AuditLogDto
@@ -128,18 +132,21 @@ public partial class UserAndRolesViewModel : TabViewModelBase
     {
         LoadData();
         await _dialogService.ShowGlobalToastAsync("User directory and audit log refreshed.");
+        ShowSuccessToast("User directory refreshed successfully.");
     }
 
     [RelayCommand]
     private async Task ExportAuditLogAsync()
     {
         await _dialogService.ShowGlobalToastAsync("Exported Security Audit Log to Excel.");
+        ShowSuccessToast("Security Audit Log exported cleanly to Excel.");
     }
 
     [RelayCommand]
     private async Task SaveRolePermissionsAsync()
     {
         await _dialogService.ShowGlobalToastAsync("Permissions updated successfully.");
+        ShowSuccessToast("Role permissions saved cleanly.");
     }
 
     [RelayCommand]
@@ -147,13 +154,16 @@ public partial class UserAndRolesViewModel : TabViewModelBase
     {
         await _identityService.LogSecurityEventAsync(Guid.Empty, userId, "PasswordReset", "High", "Password reset initiated", "127.0.0.1");
         await _dialogService.ShowGlobalToastAsync("Password reset initiated");
+        ShowSuccessToast("Password reset initiated successfully.");
     }
 
     [RelayCommand]
-    private async Task ToggleUserStatusAsync(UserDto user)
+    private async Task ToggleUserStatusAsync(UserDto? user)
     {
+        if (user == null) return;
         user.IsActive = !user.IsActive;
         await _identityService.LogSecurityEventAsync(Guid.Empty, user.Id, "StatusToggle", "Medium", $"User status changed to {user.IsActive}", "127.0.0.1");
         await _dialogService.ShowGlobalToastAsync($"User status updated to {(user.IsActive ? "Active" : "Inactive")}.");
+        ShowSuccessToast($"User '{user.Username}' status toggled to {(user.IsActive ? "Active" : "Inactive")}.");
     }
 }
