@@ -101,6 +101,7 @@ public partial class App : System.Windows.Application
     private void OnDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
     {
         Log.Error(e.Exception, "An unhandled UI Dispatcher exception occurred.");
+        MessageBox.Show($"UI Operation Error: {e.Exception.Message}", "YAERP Navigation Alert", MessageBoxButton.OK, MessageBoxImage.Warning);
         e.Handled = true;
     }
 

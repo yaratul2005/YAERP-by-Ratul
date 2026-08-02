@@ -60,6 +60,7 @@ public static class DependencyInjection
         services.AddSingleton<IReceiptPrinterService, ReceiptPrinterService>();
         services.AddSingleton<IHmacValidator, HmacValidator>();
         services.AddSingleton<IPluginManager, PluginManager>();
+        services.AddSingleton<IIdentityService, IdentityService>();
 
         services.AddScoped<IInventoryForecastingService, InventoryForecastingService>();
         services.AddScoped<IApprovalWorkflowService, ApprovalWorkflowService>();
