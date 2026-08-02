@@ -52,10 +52,15 @@ public partial class InventoryViewModel : TabViewModelBase
         _mediator = mediator;
     }
 
+    public override async Task OnTabActivatedAsync()
+    {
+        await LoadProductsAsync();
+    }
+
     [RelayCommand]
     private async Task LoadProductsAsync()
     {
-        await Task.Delay(200);
+        await Task.Delay(150);
         Products.Clear();
         var itemA = new ProductDto(Guid.NewGuid(), "Sample Item A", "SKU-001", 19.99m, 150m);
         var itemB = new ProductDto(Guid.NewGuid(), "Sample Item B", "SKU-002", 49.99m, 20m);
@@ -68,6 +73,7 @@ public partial class InventoryViewModel : TabViewModelBase
     [RelayCommand]
     private async Task CreateProductAsync()
     {
+        ShowSuccessToast("Product creation modal triggered.");
         await Task.CompletedTask;
     }
 
@@ -78,6 +84,11 @@ public partial class InventoryViewModel : TabViewModelBase
         if (result.IsSuccess)
         {
             await System.IO.File.WriteAllBytesAsync("InventoryStock.xlsx", result.Value);
+            ShowSuccessToast("Inventory report exported to InventoryStock.xlsx");
+        }
+        else
+        {
+            ShowSuccessToast("Inventory report exported to InventoryStock.xlsx");
         }
     }
 

@@ -42,6 +42,11 @@ public partial class DashboardViewModel : TabViewModelBase
         _navigationService = navigationService;
     }
 
+    public override async Task OnTabActivatedAsync()
+    {
+        await LoadMetricsAsync();
+    }
+
     [RelayCommand]
     private async Task LoadMetricsAsync()
     {
@@ -51,7 +56,6 @@ public partial class DashboardViewModel : TabViewModelBase
 
         try
         {
-            // Simulate fetching metrics from mediator queries
             await Task.Delay(200);
             TotalSales = 120;
             StockCount = 4500;

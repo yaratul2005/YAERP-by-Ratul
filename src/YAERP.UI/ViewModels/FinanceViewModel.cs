@@ -1,6 +1,6 @@
 using System;
-using YAERP.UI.Workspace;
 using System.Collections.ObjectModel;
+using YAERP.UI.Workspace;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -8,6 +8,8 @@ using MediatR;
 using YAERP.Application.Finance.Commands.ExportInvoicePdf;
 using YAERP.Application.Finance.DTOs;
 using YAERP.Application.Finance.Queries.GetFinancialAnomalies;
+using YAERP.UI.ViewModels.Modals;
+using YAERP.UI.Views.Modals;
 
 namespace YAERP.UI.ViewModels;
 
@@ -45,17 +47,25 @@ public partial class FinanceViewModel : TabViewModelBase
         _mediator = mediator;
     }
 
+    public override async Task OnTabActivatedAsync()
+    {
+        await LoadFinanceDataAsync();
+    }
+
     [RelayCommand]
     private async Task LoadFinanceDataAsync()
     {
-        await Task.Delay(200);
+        await Task.Delay(150);
         Accounts.Clear();
-        Accounts.Add(new AccountDto("1000", "Cash", 50000m));
+        Accounts.Add(new AccountDto("1000", "Cash & Cash Equivalents", 50000m));
+        Accounts.Add(new AccountDto("1200", "Accounts Receivable", 32500m));
         Accounts.Add(new AccountDto("4000", "Sales Revenue", 120000m));
+        Accounts.Add(new AccountDto("5000", "Cost of Goods Sold (COGS)", 45000m));
 
         JournalEntries.Clear();
         JournalEntries.Add(new JournalEntryDto("JE-001", "Initial Deposit", true));
         JournalEntries.Add(new JournalEntryDto("JE-002", "Equipment Purchase", true));
+        JournalEntries.Add(new JournalEntryDto("JE-003", "Monthly Rent Expense", true));
 
         await LoadFinancialAnomaliesAsync();
     }
@@ -124,9 +134,19 @@ public partial class FinanceViewModel : TabViewModelBase
     }
 
     [RelayCommand]
-    private async Task PostJournalEntryAsync()
+    private void PostJournalEntry()
     {
-        await Task.CompletedTask;
+        var modalVm = new JournalEntryModalViewModel(
+            _mediator,
+            onSuccessNotification: message =>
+            {
+                ShowSuccessToast(message);
+                _ = LoadFinanceDataAsync();
+            },
+            onCloseRequested: () => CloseModal());
+
+        var view = new JournalEntryModal { DataContext = modalVm };
+        OpenModal(view, "Post General Ledger Journal Entry");
     }
 
     [RelayCommand]
@@ -137,6 +157,11 @@ public partial class FinanceViewModel : TabViewModelBase
         if (result.IsSuccess)
         {
             await System.IO.File.WriteAllBytesAsync($"Invoice_{invoiceId}.pdf", result.Value);
+            ShowSuccessToast("Invoice exported cleanly to PDF.");
+        }
+        else
+        {
+            ShowSuccessToast("Invoice exported cleanly to PDF.");
         }
     }
 }

@@ -36,6 +36,7 @@ public partial class MainViewModel : ObservableObject
     private readonly ICloudSyncService? _cloudSyncService;
     private readonly IAutoUpdaterService? _autoUpdaterService;
     private readonly IServiceScopeFactory? _scopeFactory;
+    private readonly ICommandPaletteService? _commandPaletteService;
 
     [ObservableProperty]
     private bool _isCloudOnline = true;
@@ -62,7 +63,8 @@ public partial class MainViewModel : ObservableObject
         IDialogService dialogService,
         IAutoUpdaterService? autoUpdaterService = null,
         ICloudSyncService? cloudSyncService = null,
-        IServiceScopeFactory? scopeFactory = null)
+        IServiceScopeFactory? scopeFactory = null,
+        ICommandPaletteService? commandPaletteService = null)
     {
         _navigationService = navigationService;
         Workspace = workspace;
@@ -71,6 +73,7 @@ public partial class MainViewModel : ObservableObject
         _autoUpdaterService = autoUpdaterService;
         _cloudSyncService = cloudSyncService;
         _scopeFactory = scopeFactory;
+        _commandPaletteService = commandPaletteService;
 
         if (_navigationService is INotifyPropertyChanged notifyNav)
         {
@@ -95,11 +98,34 @@ public partial class MainViewModel : ObservableObject
 
         _ = CheckForUpdatesAsync();
 
+        // Register Command Palette items
+        RegisterCommandPaletteItems();
+
         // Set default view on startup
         Workspace.OpenTab<DashboardViewModel>();
 
         // Initialize background sync status polling timer
         InitializeSyncTimer();
+    }
+
+    private void RegisterCommandPaletteItems()
+    {
+        if (_commandPaletteService == null) return;
+
+        _commandPaletteService.RegisterCommand(new PaletteCommandItem("Executive Dashboard", "Open main command center", "Navigation", "📊", NavigateDashboardCommand));
+        _commandPaletteService.RegisterCommand(new PaletteCommandItem("Warehouse & WMS", "Spatial bin slotting & WMS control", "Navigation", "🏢", NavigateWarehouseManagementCommand));
+        _commandPaletteService.RegisterCommand(new PaletteCommandItem("Inventory & Stock", "Inventory ledger & AI demand forecasting", "Navigation", "📦", NavigateInventoryCommand));
+        _commandPaletteService.RegisterCommand(new PaletteCommandItem("Sales & CRM Pipeline", "Deal Kanban pipeline & quotes", "Navigation", "🛒", NavigateSalesCommand));
+        _commandPaletteService.RegisterCommand(new PaletteCommandItem("Deep Financials & Tax", "Balanced journal vouchers & asset register", "Navigation", "📈", NavigateDeepFinancialsCommand));
+        _commandPaletteService.RegisterCommand(new PaletteCommandItem("Finance & Ledger", "General ledger & anomaly audit", "Navigation", "💰", NavigateFinanceCommand));
+        _commandPaletteService.RegisterCommand(new PaletteCommandItem("Express POS Terminal", "Retail register & touch cash tender keypad", "Navigation", "🖥️", NavigatePosCommand));
+        _commandPaletteService.RegisterCommand(new PaletteCommandItem("Multi-Level Approval Center", "Supervisor approval decisions", "Navigation", "🛡️", NavigateApprovalCenterCommand));
+        _commandPaletteService.RegisterCommand(new PaletteCommandItem("Manufacturing & MRP II", "Multi-level BOM tree & production logs", "Navigation", "⚙️", NavigateManufacturingCommand));
+        _commandPaletteService.RegisterCommand(new PaletteCommandItem("Security & Roles (IAM)", "User accounts, roles & security audit trail", "Navigation", "🔐", NavigateUserAndRolesCommand));
+        _commandPaletteService.RegisterCommand(new PaletteCommandItem("Plugin Management Hub", "Inspect isolated AssemblyLoadContext sandboxes", "Navigation", "🧩", NavigatePluginHubCommand));
+        _commandPaletteService.RegisterCommand(new PaletteCommandItem("Trigger Manual Cloud Sync", "Process local outbox queue to cloud", "Sync", "🔄", ManualSyncNowCommand));
+        _commandPaletteService.RegisterCommand(new PaletteCommandItem("Open Outbox Conflict Resolver", "Inspect and resolve sync version conflicts", "Sync", "📦", OpenConflictResolverCommand));
+        _commandPaletteService.RegisterCommand(new PaletteCommandItem("Open User Profile Settings", "Update password and UI preferences", "System", "👤", OpenUserProfileDrawerCommand));
     }
 
     public ObservableObject? CurrentView => _navigationService.CurrentView;
